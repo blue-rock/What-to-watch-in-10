@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:/lewis-verstappen\" log --oneline -5)",
+      "Bash(cmd.exe /c \"node --version\")",
+      "Bash(cmd.exe /c \"npm --version\")",
+      "Bash(cmd.exe /c \"npx --version\")",
+      "Bash(cmd.exe /c \"bun --version\")",
+      "Bash(cmd.exe /c \"pnpm --version\")",
+      "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm run dev)"
+    ]
+  }
+}

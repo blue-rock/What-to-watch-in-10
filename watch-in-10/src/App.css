@@ -1,0 +1,61 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__main {
+  flex: 1;
+}
+
+.app__error {
+  max-width: var(--max-width);
+  margin: 24px auto 0;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.app__error p {
+  padding: 14px 20px;
+  background: var(--color-error-light);
+  color: var(--color-error);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.app__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.app__refresh-btn,
+.app__reset-btn {
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.app__refresh-btn {
+  color: white;
+  background: var(--color-accent);
+}
+
+.app__refresh-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.app__reset-btn {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.app__reset-btn:hover {
+  background: var(--color-accent);
+  color: white;
+}

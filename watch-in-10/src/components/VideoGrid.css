@@ -1,0 +1,47 @@
+.video-grid-section {
+  max-width: var(--max-width);
+  margin: 36px auto 0;
+  padding: 0 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.video-grid__fallback-note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,61 @@
+.time-picker {
+  max-width: var(--max-width);
+  margin: 32px auto 0;
+  padding: 0 20px;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+.time-picker__label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.time-picker__pills {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.time-pill {
+  padding: 10px 22px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  transition: all var(--transition);
+}
+
+.time-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.time-pill--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+.time-pill--active:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: white;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,40 @@
+.header {
+  text-align: center;
+  padding: 48px 20px 32px;
+}
+
+.header__title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.header__accent {
+  color: var(--color-accent);
+}
+
+.header__subtitle {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 32px 16px 24px;
+  }
+
+  .header__title {
+    font-size: 1.6rem;
+  }
+
+  .header__subtitle {
+    font-size: 0.95rem;
+  }
+}
