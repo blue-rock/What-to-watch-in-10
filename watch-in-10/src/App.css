@@ -8,6 +8,32 @@
   flex: 1;
 }
 
+.app__scroll-anchor {
+  scroll-margin-top: 20px;
+}
+
+.app__context {
+  max-width: var(--max-width);
+  margin: 32px auto 0;
+  padding: 0 20px;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app__context strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.app__context-count {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+}
+
 .app__error {
   max-width: var(--max-width);
   margin: 24px auto 0;

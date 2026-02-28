@@ -6,7 +6,7 @@ export default function VideoGrid({ videos, usingFallback }) {
     <section className="video-grid-section">
       {usingFallback && (
         <p className="video-grid__fallback-note">
-          Showing sample picks — add a YouTube API key to get personalized results.
+          Showing sample picks — live results temporarily unavailable.
         </p>
       )}
       <div className="video-grid">

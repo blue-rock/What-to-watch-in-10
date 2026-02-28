@@ -25,6 +25,24 @@
   margin-right: auto;
 }
 
+.header__surprise-btn {
+  margin-top: 20px;
+  padding: 10px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border: 2px solid transparent;
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.header__surprise-btn:hover {
+  background: var(--color-accent);
+  color: white;
+  transform: scale(1.05);
+}
+
 @media (max-width: 600px) {
   .header {
     padding: 32px 16px 24px;

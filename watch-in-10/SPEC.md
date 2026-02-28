@@ -6,7 +6,7 @@ A curated short content discovery website that helps users find short-form video
 ## Tech Stack
 - **Frontend**: React 19 + Vite
 - **Styling**: Plain CSS with CSS variables
-- **API**: YouTube Data API v3
+- **API**: YouTube internal API via serverless proxy (no key needed)
 - **Font**: Inter (Google Fonts)
 
 ## Current Features (v1.0)
@@ -14,20 +14,17 @@ A curated short content discovery website that helps users find short-form video
 - [x] Time picker (5, 10, 15, 20, 30 minutes)
 - [x] YouTube API integration with mood-based search queries
 - [x] Video results grid with thumbnails, titles, durations, and direct YouTube links
-- [x] Fallback sample data when no API key is configured
+- [x] No API key required — uses YouTube's internal API via a lightweight server proxy
+- [x] Fallback sample data when network is unavailable
 - [x] Responsive design (mobile-first)
 - [x] Clean/minimal design aesthetic
 
 ## Setup
 1. Install Node.js (v18+)
 2. Run `npm install` in the `watch-in-10/` directory
-3. Copy `.env.example` to `.env` and add your YouTube API key
-4. Run `npm run dev`
+3. Run `npm run dev`
 
-## API Key
-- Get a YouTube Data API v3 key from https://console.cloud.google.com/
-- Enable "YouTube Data API v3" in your Google Cloud project
-- Add the key to `.env` as `VITE_YOUTUBE_API_KEY`
+No API key or environment variables required.
 
 ---
 
@@ -67,11 +64,13 @@ A curated short content discovery website that helps users find short-form video
 
 ## Architecture Notes
 
-### YouTube API Strategy
-- **Search API** finds videos matching mood keywords
-- **Videos API** fetches exact durations for filtering
+### Video Search Strategy
+- **YouTube internal API** (`/youtubei/v1/search`) — same endpoint YouTube.com uses, no API key
+- Server proxy at `/api/search` handles the POST request (Vite plugin in dev, serverless function in prod)
+- Falls back to curated sample data (`src/data/fallback.js`) on network failure
 - Mood-to-query mapping lives in `src/data/moods.js`
-- Duration filtering happens client-side after fetching
+- 4-layer recommendation: tag search → keyword search → negative filtering → score + rank
+- Deployable to Vercel/Netlify with zero configuration (serverless function in `api/search.js`)
 
 ### Component Hierarchy
 ```

@@ -1,6 +1,6 @@
 import './Header.css';
 
-export default function Header() {
+export default function Header({ onSurpriseMe }) {
   return (
     <header className="header">
       <h1 className="header__title">
@@ -10,6 +10,11 @@ export default function Header() {
       <p className="header__subtitle">
         Short films, mini docs, TED talks &amp; more — curated for your mood and your time.
       </p>
+      {onSurpriseMe && (
+        <button className="header__surprise-btn" onClick={onSurpriseMe}>
+          Surprise Me
+        </button>
+      )}
     </header>
   );
 }
