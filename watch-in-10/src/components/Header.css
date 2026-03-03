@@ -3,6 +3,46 @@
   padding: 48px 20px 32px;
 }
 
+.header__top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  max-width: var(--max-width);
+  margin: 0 auto 8px;
+  padding: 0 20px;
+}
+
+.header__theme-btn {
+  font-size: 1.4rem;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition);
+  line-height: 1;
+}
+
+.header__theme-btn:hover {
+  background: var(--color-accent-light);
+  transform: scale(1.1);
+}
+
+.header__favorites-btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.header__favorites-btn:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
 .header__title {
   font-size: 2.4rem;
   font-weight: 700;

@@ -6,8 +6,7 @@
   overflow: hidden;
   box-shadow: var(--shadow);
   transition: all var(--transition);
-  text-decoration: none;
-  color: inherit;
+  cursor: pointer;
 }
 
 .video-card:hover {
@@ -20,7 +19,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
 .video-card__thumb {
@@ -45,6 +44,56 @@
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.02em;
+}
+
+.video-card__play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-size: 1.6rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--transition);
+  pointer-events: none;
+}
+
+.video-card:hover .video-card__play-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.video-card__fav-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 1.1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--transition);
+  z-index: 2;
+}
+
+.video-card:hover .video-card__fav-btn,
+.video-card__fav-btn--active {
+  opacity: 1;
+}
+
+.video-card__fav-btn:hover {
+  transform: scale(1.2);
 }
 
 .video-card__info {

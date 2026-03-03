@@ -146,3 +146,32 @@ export async function fetchVideos(mood, maxMinutes) {
 
   return result.map(({ relevanceScore, tags, ...video }) => video);
 }
+
+/**
+ * Search videos by a free-text query + duration.
+ * Simpler path than fetchVideos — no tag scoring, just duration filter + popularity sort.
+ * Returns an array of video objects (max 9), or an empty array on failure.
+ */
+export async function searchByQuery(query, maxMinutes) {
+  const results = await searchVideos(query, maxMinutes);
+
+  const seenIds = new Set();
+  const minSeconds = Math.max(0, (maxMinutes - 3) * 60);
+  const maxSeconds = (maxMinutes + 2) * 60;
+  const filtered = [];
+
+  for (const video of results) {
+    if (!video.id || seenIds.has(video.id)) continue;
+    seenIds.add(video.id);
+
+    if (video.durationSeconds < minSeconds || video.durationSeconds > maxSeconds) {
+      continue;
+    }
+
+    filtered.push(video);
+  }
+
+  filtered.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+
+  return filtered.slice(0, 9).map(({ tags, ...video }) => video);
+}

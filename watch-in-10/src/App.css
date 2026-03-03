@@ -8,6 +8,37 @@
   flex: 1;
 }
 
+.app__divider {
+  text-align: center;
+  margin: 24px auto;
+  max-width: 560px;
+  padding: 0 20px;
+  position: relative;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.app__divider::before,
+.app__divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 50px);
+  height: 1px;
+  background: var(--color-border);
+}
+
+.app__divider::before {
+  left: 20px;
+}
+
+.app__divider::after {
+  right: 20px;
+}
+
 .app__scroll-anchor {
   scroll-margin-top: 20px;
 }

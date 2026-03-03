@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { fetchVideos } from '../services/youtube';
+import { fetchVideos, searchByQuery } from '../services/youtube';
 import { fallbackVideos } from '../data/fallback';
 
 export function useYouTube() {
@@ -53,11 +53,33 @@ export function useYouTube() {
     }
   }, []);
 
+  const searchQuery = useCallback(async (query, maxMinutes) => {
+    setVideos([]);
+    setLoading(true);
+    setError(null);
+    setUsingFallback(false);
+
+    try {
+      const results = await searchByQuery(query, maxMinutes);
+
+      if (results.length === 0) {
+        setError('No videos found for that search. Try different keywords or duration!');
+      } else {
+        setVideos(results);
+      }
+    } catch (err) {
+      console.error('Video search error:', err);
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const reset = useCallback(() => {
     setVideos([]);
     setError(null);
     setUsingFallback(false);
   }, []);
 
-  return { videos, loading, error, usingFallback, search, reset };
+  return { videos, loading, error, usingFallback, search, searchQuery, reset };
 }

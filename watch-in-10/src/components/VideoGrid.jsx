@@ -1,7 +1,7 @@
 import VideoCard from './VideoCard';
 import './VideoGrid.css';
 
-export default function VideoGrid({ videos, usingFallback }) {
+export default function VideoGrid({ videos, usingFallback, onPlay, onToggleFavorite, isFavorite }) {
   return (
     <section className="video-grid-section">
       {usingFallback && (
@@ -11,7 +11,13 @@ export default function VideoGrid({ videos, usingFallback }) {
       )}
       <div className="video-grid">
         {videos.map((video) => (
-          <VideoCard key={video.id} video={video} />
+          <VideoCard
+            key={video.id}
+            video={video}
+            onPlay={onPlay}
+            onToggleFavorite={onToggleFavorite}
+            isFavorited={isFavorite?.(video.id)}
+          />
         ))}
       </div>
     </section>
