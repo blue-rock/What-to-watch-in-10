@@ -38,6 +38,21 @@
   padding: 4px 8px;
 }
 
+.video-modal__watch-together {
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.video-modal__watch-together:hover {
+  background: var(--color-accent);
+}
+
 .video-modal__close:hover,
 .video-modal__minimize:hover {
   transform: scale(1.2);

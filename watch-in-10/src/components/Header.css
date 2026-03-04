@@ -46,6 +46,21 @@
   transform: scale(1.1);
 }
 
+.header__room-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.header__room-btn:hover {
+  background: var(--color-accent-hover);
+  transform: scale(1.05);
+}
+
 .header__stats-btn {
   padding: 6px 14px;
   font-size: 0.8rem;

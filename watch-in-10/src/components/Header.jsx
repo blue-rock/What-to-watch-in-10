@@ -3,7 +3,7 @@ import './Header.css';
 
 const LOCALE_LABELS = { en: 'EN', hi: 'HI', es: 'ES', fr: 'FR' };
 
-export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavorites, onOpenQueue, onOpenStats, queueCount }) {
+export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavorites, onOpenQueue, onOpenStats, onOpenRoom, queueCount }) {
   const { t, locale, setLocale, availableLocales } = useI18n();
 
   return (
@@ -20,6 +20,11 @@ export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavor
             <option key={loc} value={loc}>{LOCALE_LABELS[loc] || loc.toUpperCase()}</option>
           ))}
         </select>
+        {onOpenRoom && (
+          <button className="header__room-btn" onClick={onOpenRoom} title={t('room.watchRoom')}>
+            {t('room.watchRoom')}
+          </button>
+        )}
         {onOpenStats && (
           <button className="header__stats-btn" onClick={onOpenStats} title={t('stats.title')}>
             {t('stats.title')}

@@ -1,0 +1,458 @@
+.watch-room {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.watch-room__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.watch-room__room-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.watch-room__code {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.watch-room__code strong {
+  color: var(--color-accent);
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.watch-room__copy-btn {
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.watch-room__copy-btn:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
+.watch-room__count {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+}
+
+.watch-room__header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.watch-room__change-btn {
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.watch-room__change-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.watch-room__leave-btn {
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e74c3c;
+  background: #fdeaea;
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+[data-theme="dark"] .watch-room__leave-btn {
+  background: rgba(231, 76, 60, 0.15);
+}
+
+.watch-room__leave-btn:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+/* Body layout */
+.watch-room__body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.watch-room__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Player */
+.watch-room__player-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000;
+  flex-shrink: 0;
+}
+
+.watch-room__player {
+  position: absolute;
+  inset: 0;
+}
+
+.watch-room__player iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Empty state */
+.watch-room__empty-player {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.watch-room__empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+}
+
+.watch-room__empty-player p {
+  font-size: 1rem;
+  max-width: 300px;
+}
+
+.watch-room__search-btn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.watch-room__search-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Video info */
+.watch-room__video-info {
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+
+.watch-room__video-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.watch-room__video-info p {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0;
+}
+
+/* Search panel */
+.watch-room__search-panel {
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.watch-room__search-form {
+  display: flex;
+  gap: 8px;
+}
+
+.watch-room__search-input {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.watch-room__search-input:focus {
+  border-color: var(--color-accent);
+}
+
+.watch-room__search-submit {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.watch-room__search-submit:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.watch-room__search-close {
+  padding: 10px;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-radius: var(--radius);
+}
+
+.watch-room__search-close:hover {
+  color: var(--color-text);
+}
+
+.watch-room__search-results {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.watch-room__search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  text-align: left;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+
+.watch-room__search-item:hover {
+  background: var(--color-accent-light);
+}
+
+.watch-room__search-thumb {
+  width: 80px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.watch-room__search-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.watch-room__search-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watch-room__search-channel {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+/* Sidebar */
+.watch-room__sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 16px;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-y: auto;
+}
+
+.watch-room__sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 14px;
+}
+
+.watch-room__participant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.watch-room__participant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.watch-room__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.watch-room__pname {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.watch-room__host-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  padding: 2px 7px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+/* Reactions bar */
+.watch-room__reactions-bar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.watch-room__react-btn {
+  font-size: 1.4rem;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: transparent;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.watch-room__react-btn:hover {
+  background: var(--color-accent-light);
+  transform: scale(1.25);
+}
+
+.watch-room__react-btn:active {
+  transform: scale(0.9);
+}
+
+/* Floating reaction overlay */
+.watch-room__reaction-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.watch-room__floating-emoji {
+  position: absolute;
+  bottom: 0;
+  font-size: 2rem;
+  animation: wr-float-up 3s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes wr-float-up {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-350px) scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .watch-room__body {
+    flex-direction: column;
+  }
+
+  .watch-room__sidebar {
+    width: auto;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    max-height: 120px;
+    padding: 10px 16px;
+  }
+
+  .watch-room__participant-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .watch-room__header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .watch-room__room-info {
+    gap: 8px;
+  }
+
+  .watch-room__react-btn {
+    font-size: 1.2rem;
+    padding: 5px 7px;
+  }
+
+  .watch-room__reactions-bar {
+    gap: 4px;
+    padding: 8px 12px;
+  }
+}

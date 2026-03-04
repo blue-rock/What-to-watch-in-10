@@ -18,6 +18,8 @@ import WatchQueue from './components/WatchQueue';
 import MiniPlayer from './components/MiniPlayer';
 import OfflineBanner from './components/OfflineBanner';
 import StatsPage from './components/StatsPage';
+import WatchRoom from './components/WatchRoom';
+import WatchRoomLobby from './components/WatchRoomLobby';
 import { useYouTube } from './hooks/useYouTube';
 import { useTheme } from './hooks/useTheme';
 import { useFavorites } from './hooks/useFavorites';
@@ -26,6 +28,7 @@ import { useWatchQueue } from './hooks/useWatchQueue';
 import { useUsageTracker } from './hooks/useUsageTracker';
 import { useShareList } from './hooks/useShareList';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useWatchRoom } from './hooks/useWatchRoom';
 import { useI18n } from './hooks/useI18n';
 import { copyVideoLink, shareNative } from './utils/share';
 import { getTopMoods, getSuggestedQueries } from './services/recommendations';
@@ -61,6 +64,9 @@ export default function App() {
   const { queue, addToQueue, removeFromQueue, clearQueue, nextInQueue } = useWatchQueue();
   const { usage, trackMood, trackSearch, trackWatch } = useUsageTracker();
   const { share } = useShareList();
+  const room = useWatchRoom();
+  const [roomMode, setRoomMode] = useState(null); // null | 'lobby' | 'room'
+  const [initialRoomCode, setInitialRoomCode] = useState('');
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -268,6 +274,54 @@ export default function App() {
     setDismissedIds((prev) => new Set(prev).add(videoId));
   }, []);
 
+  // Watch Room: check URL hash for room code on mount
+  useEffect(() => {
+    const hash = window.location.hash;
+    const match = hash.match(/#room=([A-Z0-9]+)/i);
+    if (match) {
+      setInitialRoomCode(match[1].toUpperCase());
+      setRoomMode('lobby');
+    }
+  }, []);
+
+  // Watch Room: sync URL hash with room state
+  useEffect(() => {
+    if (room.roomId) {
+      setRoomMode('room');
+      window.location.hash = `room=${room.roomId}`;
+    } else if (roomMode === 'room') {
+      setRoomMode(null);
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }, [room.roomId]);
+
+  const handleCreateRoom = useCallback(async (video, userName) => {
+    const code = await room.createRoom(video, userName);
+    if (code) setRoomMode('room');
+  }, [room]);
+
+  const handleJoinRoom = useCallback(async (code, userName) => {
+    const ok = await room.joinRoom(code, userName);
+    if (ok) setRoomMode('room');
+    return ok;
+  }, [room]);
+
+  const handleLeaveRoom = useCallback(async () => {
+    await room.leaveRoom();
+    setRoomMode(null);
+    history.replaceState(null, '', window.location.pathname);
+  }, [room]);
+
+  const handleWatchTogether = useCallback(async (video) => {
+    const userName = localStorage.getItem('watch10-user-name') || 'Host';
+    const code = await room.createRoom(video, userName);
+    if (code) {
+      setActiveVideo(null);
+      setMiniPlayerVideo(null);
+      setRoomMode('room');
+    }
+  }, [room]);
+
   const showResults = videos.length > 0 && !loading;
   const showTimePicker = selectedMood || searchTerm;
   const showDailyPicks = !selectedMood && !searchTerm && videos.length === 0 && !loading;
@@ -285,6 +339,7 @@ export default function App() {
         onOpenFavorites={() => setShowFavorites(true)}
         onOpenQueue={() => setShowQueue(true)}
         onOpenStats={() => setShowStats(true)}
+        onOpenRoom={() => setRoomMode('lobby')}
         queueCount={queue.length}
       />
 
@@ -466,6 +521,7 @@ export default function App() {
           relatedVideos={relatedVideos}
           onPlayRelated={handlePlayRelated}
           onVideoEnd={handleVideoEnd}
+          onWatchTogether={handleWatchTogether}
         />
       )}
 
@@ -502,6 +558,32 @@ export default function App() {
           onRemove={removeFromQueue}
           onClear={clearQueue}
           onClose={() => setShowQueue(false)}
+        />
+      )}
+
+      {roomMode === 'lobby' && (
+        <WatchRoomLobby
+          isConfigured={room.configured}
+          onCreateRoom={handleCreateRoom}
+          onJoinRoom={handleJoinRoom}
+          onClose={() => { setRoomMode(null); setInitialRoomCode(''); history.replaceState(null, '', window.location.pathname); }}
+          error={room.error}
+          initialRoomCode={initialRoomCode}
+        />
+      )}
+
+      {roomMode === 'room' && room.roomId && (
+        <WatchRoom
+          roomId={room.roomId}
+          roomData={room.roomData}
+          isHost={room.isHost}
+          participants={room.participants}
+          reactions={room.reactions}
+          userId={room.userId}
+          onSyncPlayback={room.syncPlayback}
+          onSendReaction={room.sendReaction}
+          onSetVideo={room.setVideo}
+          onLeave={handleLeaveRoom}
         />
       )}
     </div>

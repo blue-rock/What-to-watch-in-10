@@ -27,7 +27,7 @@ function loadYTApi() {
   return apiPromise;
 }
 
-export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVideos, onPlayRelated, onVideoEnd }) {
+export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVideos, onPlayRelated, onVideoEnd, onWatchTogether }) {
   const { t } = useI18n();
   const overlayRef = useRef(null);
   const closeRef = useRef(null);
@@ -125,6 +125,15 @@ export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVi
     >
       <div className="video-modal__content">
         <div className="video-modal__top-actions">
+          {onWatchTogether && (
+            <button
+              className="video-modal__watch-together"
+              onClick={() => onWatchTogether(video)}
+              title={t('room.watchRoom')}
+            >
+              {t('room.watchRoom')}
+            </button>
+          )}
           {onMinimize && (
             <button className="video-modal__minimize" onClick={onMinimize} title={t('miniPlayer.minimize')}>
               &#8600;
