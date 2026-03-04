@@ -21,6 +21,7 @@ export default async (req) => {
   const url = new URL(req.url);
   const q = url.searchParams.get('q');
   const duration = url.searchParams.get('duration');
+  const hl = url.searchParams.get('hl') || 'en';
 
   if (!q) {
     return new Response(JSON.stringify({ error: 'Missing "q" query parameter' }), {
@@ -34,7 +35,7 @@ export default async (req) => {
       client: {
         clientName: 'WEB',
         clientVersion: '2.20250227.00.00',
-        hl: 'en',
+        hl,
         gl: 'US',
       },
     },

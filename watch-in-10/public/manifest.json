@@ -1,0 +1,16 @@
+{
+  "name": "What Should I Watch in 10 Minutes?",
+  "short_name": "Watch in 10",
+  "description": "Discover short videos curated for your mood and your time",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

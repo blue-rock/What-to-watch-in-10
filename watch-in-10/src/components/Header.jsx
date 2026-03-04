@@ -1,16 +1,42 @@
+import { useI18n } from '../hooks/useI18n';
 import './Header.css';
 
-export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavorites }) {
+const LOCALE_LABELS = { en: 'EN', hi: 'HI', es: 'ES', fr: 'FR' };
+
+export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavorites, onOpenQueue, onOpenStats, queueCount }) {
+  const { t, locale, setLocale, availableLocales } = useI18n();
+
   return (
     <header className="header">
-      <div className="header__top-bar">
+      <a href="#main-content" className="skip-to-content">{t('header.skipToContent')}</a>
+      <nav className="header__top-bar" aria-label="Site actions">
+        <select
+          className="header__lang-select"
+          value={locale}
+          onChange={(e) => setLocale(e.target.value)}
+          aria-label="Select language"
+        >
+          {availableLocales.map((loc) => (
+            <option key={loc} value={loc}>{LOCALE_LABELS[loc] || loc.toUpperCase()}</option>
+          ))}
+        </select>
+        {onOpenStats && (
+          <button className="header__stats-btn" onClick={onOpenStats} title={t('stats.title')}>
+            {t('stats.title')}
+          </button>
+        )}
+        {onOpenQueue && (
+          <button className="header__queue-btn" onClick={onOpenQueue} title={t('queue.title')}>
+            &#128339; {queueCount > 0 && <span className="header__queue-badge">{queueCount}</span>}
+          </button>
+        )}
         {onOpenFavorites && (
           <button
             className="header__favorites-btn"
             onClick={onOpenFavorites}
-            aria-label="Open favorites and history"
+            aria-label={t('fav.favorites')}
           >
-            &#9829; My List
+            {t('header.myList')}
           </button>
         )}
         {onToggleTheme && (
@@ -23,17 +49,15 @@ export default function Header({ onSurpriseMe, theme, onToggleTheme, onOpenFavor
             {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
           </button>
         )}
-      </div>
+      </nav>
       <h1 className="header__title">
-        What Should I Watch
-        <span className="header__accent"> in 10 Minutes?</span>
+        {t('header.title1')}
+        <span className="header__accent">{t('header.title2')}</span>
       </h1>
-      <p className="header__subtitle">
-        Short films, mini docs, TED talks &amp; more — curated for your mood and your time.
-      </p>
+      <p className="header__subtitle">{t('header.subtitle')}</p>
       {onSurpriseMe && (
         <button className="header__surprise-btn" onClick={onSurpriseMe}>
-          Surprise Me
+          {t('header.surpriseMe')}
         </button>
       )}
     </header>

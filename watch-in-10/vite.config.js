@@ -70,6 +70,7 @@ function youtubeSearchPlugin() {
         const url = new URL(req.url, 'http://localhost');
         const q = url.searchParams.get('q');
         const duration = url.searchParams.get('duration');
+        const hl = url.searchParams.get('hl') || 'en';
 
         if (!q) {
           res.statusCode = 400;
@@ -82,7 +83,7 @@ function youtubeSearchPlugin() {
             client: {
               clientName: 'WEB',
               clientVersion: '2.20250227.00.00',
-              hl: 'en',
+              hl,
               gl: 'US',
             },
           },

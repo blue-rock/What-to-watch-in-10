@@ -112,7 +112,116 @@
   background: var(--color-accent-light);
 }
 
+.app__share-btn {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.app__share-btn:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
 .app__reset-btn:hover {
   background: var(--color-accent);
   color: white;
+}
+
+.app__tab-content {
+  max-width: var(--max-width);
+  margin: 24px auto 0;
+  padding: 0 20px;
+}
+
+.app__tab-empty {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: 0.9rem;
+  margin-top: 40px;
+}
+
+.app__playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.app__playlist-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.app__playlist-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow);
+}
+
+.app__playlist-card-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.app__playlist-card-count {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+/* Personalized recommendations */
+.app__recommendations {
+  max-width: var(--max-width);
+  margin: 20px auto 8px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app__rec-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app__rec-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.app__rec-chip {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border-radius: 100px;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.app__rec-chip:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
+.app__rec-chip--search {
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.app__rec-chip--search:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-light);
 }

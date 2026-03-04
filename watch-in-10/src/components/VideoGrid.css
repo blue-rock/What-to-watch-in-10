@@ -35,6 +35,11 @@
   }
 }
 
+.video-grid__sentinel {
+  height: 1px;
+  width: 100%;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

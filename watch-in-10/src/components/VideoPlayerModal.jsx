@@ -1,11 +1,89 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { useI18n } from '../hooks/useI18n';
 import './VideoPlayerModal.css';
 
-export default function VideoPlayerModal({ video, onClose }) {
+// Load the YouTube IFrame API script once
+let apiReady = false;
+let apiPromise = null;
+function loadYTApi() {
+  if (apiReady) return Promise.resolve();
+  if (apiPromise) return apiPromise;
+  apiPromise = new Promise((resolve) => {
+    if (window.YT && window.YT.Player) {
+      apiReady = true;
+      resolve();
+      return;
+    }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      apiReady = true;
+      prev?.();
+      resolve();
+    };
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  });
+  return apiPromise;
+}
+
+export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVideos, onPlayRelated, onVideoEnd }) {
+  const { t } = useI18n();
   const overlayRef = useRef(null);
   const closeRef = useRef(null);
+  const playerRef = useRef(null);
+  const containerRef = useRef(null);
+  const [videoError, setVideoError] = useState(false);
+  const [countdown, setCountdown] = useState(null);
+  const countdownTimer = useRef(null);
 
   const videoId = video?.url?.match(/[?&]v=([^&]+)/)?.[1] || video?.id;
+
+  // Initialize YouTube player with error detection
+  useEffect(() => {
+    setVideoError(false);
+    setCountdown(null);
+    clearTimeout(countdownTimer.current);
+
+    let player = null;
+
+    loadYTApi().then(() => {
+      if (!containerRef.current) return;
+      player = new window.YT.Player(containerRef.current, {
+        videoId,
+        playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
+        events: {
+          onError: () => {
+            setVideoError(true);
+            if (relatedVideos && relatedVideos.length > 0) {
+              let sec = 3;
+              setCountdown(sec);
+              const tick = () => {
+                sec -= 1;
+                if (sec <= 0) {
+                  onPlayRelated?.(relatedVideos[0]);
+                } else {
+                  setCountdown(sec);
+                  countdownTimer.current = setTimeout(tick, 1000);
+                }
+              };
+              countdownTimer.current = setTimeout(tick, 1000);
+            }
+          },
+          onStateChange: (e) => {
+            if (e.data === 0) onVideoEnd?.(); // video ended
+          },
+        },
+      });
+      playerRef.current = player;
+    });
+
+    return () => {
+      clearTimeout(countdownTimer.current);
+      try { playerRef.current?.destroy(); } catch { /* ignore */ }
+      playerRef.current = null;
+    };
+  }, [videoId, relatedVideos, onPlayRelated, onVideoEnd]);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -27,6 +105,13 @@ export default function VideoPlayerModal({ video, onClose }) {
     [onClose]
   );
 
+  const handleSkipNow = useCallback(() => {
+    clearTimeout(countdownTimer.current);
+    if (relatedVideos && relatedVideos.length > 0) {
+      onPlayRelated?.(relatedVideos[0]);
+    }
+  }, [relatedVideos, onPlayRelated]);
+
   if (!video) return null;
 
   return (
@@ -39,25 +124,63 @@ export default function VideoPlayerModal({ video, onClose }) {
       aria-label={`Playing: ${video.title}`}
     >
       <div className="video-modal__content">
-        <button
-          className="video-modal__close"
-          onClick={onClose}
-          ref={closeRef}
-          aria-label="Close video player"
-        >
-          &times;
-        </button>
+        <div className="video-modal__top-actions">
+          {onMinimize && (
+            <button className="video-modal__minimize" onClick={onMinimize} title={t('miniPlayer.minimize')}>
+              &#8600;
+            </button>
+          )}
+          <button
+            className="video-modal__close"
+            onClick={onClose}
+            ref={closeRef}
+            aria-label={t('player.close')}
+          >
+            &times;
+          </button>
+        </div>
         <div className="video-modal__embed-wrap">
-          <iframe
-            className="video-modal__iframe"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
-            title={video.title}
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
+          {videoError ? (
+            <div className="video-modal__error">
+              <span className="video-modal__error-icon">&#9888;</span>
+              <p className="video-modal__error-text">{t('player.unavailable')}</p>
+              {relatedVideos && relatedVideos.length > 0 ? (
+                <button className="video-modal__error-skip" onClick={handleSkipNow}>
+                  {t('player.skipNext')}{countdown !== null && ` (${countdown}s)`}
+                </button>
+              ) : (
+                <button className="video-modal__error-skip" onClick={onClose}>
+                  {t('player.close2')}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div ref={containerRef} className="video-modal__player" />
+          )}
         </div>
         <p className="video-modal__title">{video.title}</p>
         <p className="video-modal__channel">{video.channel}</p>
+
+        {relatedVideos && relatedVideos.length > 0 && (
+          <div className="video-modal__related">
+            <p className="video-modal__related-label">{t('player.upNext')}</p>
+            <div className="video-modal__related-list">
+              {relatedVideos.map((rv) => (
+                <button
+                  key={rv.id}
+                  className="video-modal__related-item"
+                  onClick={() => onPlayRelated?.(rv)}
+                >
+                  <img src={rv.thumbnail} alt={rv.title} className="video-modal__related-thumb" />
+                  <div className="video-modal__related-info">
+                    <span className="video-modal__related-title">{rv.title}</span>
+                    <span className="video-modal__related-channel">{rv.channel}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

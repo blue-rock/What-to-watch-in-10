@@ -11,12 +11,41 @@
 const FETCH_TIMEOUT = 12000; // ms
 
 // ---------------------------------------------------------------------------
+// Video availability check via oEmbed (lightweight — no API key needed)
+// ---------------------------------------------------------------------------
+
+async function checkAvailability(videos) {
+  if (!videos.length) return videos;
+
+  const checks = videos.map(async (video) => {
+    const id = video.url?.match(/[?&]v=([^&]+)/)?.[1] || video.id;
+    if (!id) return video;
+    try {
+      // Use noembed.com — a CORS-friendly oEmbed proxy
+      const res = await fetch(
+        `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${id}`,
+        { signal: AbortSignal.timeout(3000) }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      // noembed returns an error field for unavailable videos
+      return data.error ? null : video;
+    } catch {
+      return video; // on timeout/error, keep the video (don't block results)
+    }
+  });
+
+  const results = await Promise.all(checks);
+  return results.filter(Boolean);
+}
+
+// ---------------------------------------------------------------------------
 // Search helper
 // ---------------------------------------------------------------------------
 
-async function searchVideos(query, maxMinutes) {
-  const duration = maxMinutes <= 4 ? 'short' : 'medium';
-  const url = `/api/search?q=${encodeURIComponent(query)}&duration=${duration}`;
+async function searchVideos(query, maxMinutes, hl = 'en') {
+  const duration = maxMinutes === 'any' ? 'any' : maxMinutes <= 4 ? 'short' : 'medium';
+  const url = `/api/search?q=${encodeURIComponent(query)}&duration=${duration}&hl=${hl}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
@@ -99,23 +128,24 @@ function passesNegativeKeywords(video, negativeKeywords = []) {
  * Fetch and rank videos for a given mood + duration.
  * Returns an array of video objects (max 9), or an empty array on failure.
  */
-export async function fetchVideos(mood, maxMinutes) {
+export async function fetchVideos(mood, maxMinutes, hl = 'en') {
   const genreTags = mood.tags || [];
   const negativeKeywords = mood.negativeKeywords || [];
 
   // --- Layer 1: Tag-based search ---
   const shuffledTags = shuffle([...genreTags]);
   const tagQuery = shuffledTags.slice(0, 4).join(' | ');
-  const tagResults = await searchVideos(tagQuery, maxMinutes);
+  const tagResults = await searchVideos(tagQuery, maxMinutes, hl);
 
   // --- Layer 2: Keyword search (supplementary) ---
   const keyword = mood.queries[Math.floor(Math.random() * mood.queries.length)];
-  const keywordResults = await searchVideos(keyword, maxMinutes);
+  const keywordResults = await searchVideos(keyword, maxMinutes, hl);
 
   // --- Layer 3 + 4: Merge, dedupe, filter, score, rank ---
   const seenIds = new Set();
-  const minSeconds = Math.max(0, (maxMinutes - 3) * 60);
-  const maxSeconds = (maxMinutes + 2) * 60;
+  const anyDuration = maxMinutes === 'any';
+  const minSeconds = anyDuration ? 0 : Math.max(0, (maxMinutes - 3) * 60);
+  const maxSeconds = anyDuration ? Infinity : (maxMinutes + 2) * 60;
 
   const allResults = [...tagResults, ...keywordResults];
   const scored = [];
@@ -124,7 +154,7 @@ export async function fetchVideos(mood, maxMinutes) {
     if (!video.id || seenIds.has(video.id)) continue;
     seenIds.add(video.id);
 
-    if (video.durationSeconds < minSeconds || video.durationSeconds > maxSeconds) {
+    if (!anyDuration && (video.durationSeconds < minSeconds || video.durationSeconds > maxSeconds)) {
       continue;
     }
 
@@ -144,7 +174,8 @@ export async function fetchVideos(mood, maxMinutes) {
 
   const result = [...shuffle(high), ...shuffle(med), ...shuffle(low)].slice(0, 9);
 
-  return result.map(({ relevanceScore, tags, ...video }) => video);
+  const cleaned = result.map(({ relevanceScore, tags, ...video }) => video);
+  return checkAvailability(cleaned);
 }
 
 /**
@@ -152,19 +183,20 @@ export async function fetchVideos(mood, maxMinutes) {
  * Simpler path than fetchVideos — no tag scoring, just duration filter + popularity sort.
  * Returns an array of video objects (max 9), or an empty array on failure.
  */
-export async function searchByQuery(query, maxMinutes) {
-  const results = await searchVideos(query, maxMinutes);
+export async function searchByQuery(query, maxMinutes, hl = 'en') {
+  const results = await searchVideos(query, maxMinutes, hl);
 
   const seenIds = new Set();
-  const minSeconds = Math.max(0, (maxMinutes - 3) * 60);
-  const maxSeconds = (maxMinutes + 2) * 60;
+  const anyDuration = maxMinutes === 'any';
+  const minSeconds = anyDuration ? 0 : Math.max(0, (maxMinutes - 3) * 60);
+  const maxSeconds = anyDuration ? Infinity : (maxMinutes + 2) * 60;
   const filtered = [];
 
   for (const video of results) {
     if (!video.id || seenIds.has(video.id)) continue;
     seenIds.add(video.id);
 
-    if (video.durationSeconds < minSeconds || video.durationSeconds > maxSeconds) {
+    if (!anyDuration && (video.durationSeconds < minSeconds || video.durationSeconds > maxSeconds)) {
       continue;
     }
 
@@ -173,5 +205,6 @@ export async function searchByQuery(query, maxMinutes) {
 
   filtered.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
 
-  return filtered.slice(0, 9).map(({ tags, ...video }) => video);
+  const cleaned = filtered.slice(0, 9).map(({ tags, ...video }) => video);
+  return checkAvailability(cleaned);
 }

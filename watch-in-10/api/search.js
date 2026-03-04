@@ -22,7 +22,7 @@ const SP_FILTERS = {
 };
 
 export default async function handler(req, res) {
-  const { q, duration } = req.query || {};
+  const { q, duration, hl } = req.query || {};
 
   if (!q) {
     res.status(400).json({ error: 'Missing "q" query parameter' });
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       client: {
         clientName: 'WEB',
         clientVersion: '2.20250227.00.00',
-        hl: 'en',
+        hl: hl || 'en',
         gl: 'US',
       },
     },

@@ -13,6 +13,24 @@
   padding: 0 20px;
 }
 
+.header__lang-select {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.header__lang-select:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .header__theme-btn {
   font-size: 1.4rem;
   padding: 8px;
@@ -26,6 +44,54 @@
 .header__theme-btn:hover {
   background: var(--color-accent-light);
   transform: scale(1.1);
+}
+
+.header__stats-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.header__stats-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.header__queue-btn {
+  position: relative;
+  padding: 8px;
+  font-size: 1.1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  line-height: 1;
+}
+
+.header__queue-btn:hover {
+  border-color: var(--color-accent);
+}
+
+.header__queue-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: white;
+  background: var(--color-accent);
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 
 .header__favorites-btn {

@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useI18n } from '../hooks/useI18n';
 import './SearchBar.css';
 
-export default function SearchBar({ onSearch, value }) {
+const SearchBar = forwardRef(function SearchBar({ onSearch, value }, ref) {
+  const { t } = useI18n();
   const [query, setQuery] = useState(value || '');
+  const inputRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,27 +29,30 @@ export default function SearchBar({ onSearch, value }) {
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         <input
+          ref={inputRef}
           className="search-bar__input"
           type="text"
-          placeholder="Search for any video..."
+          placeholder={t('search.placeholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search for videos"
+          aria-label={t('search.button')}
         />
         {query && (
           <button
             type="button"
             className="search-bar__clear"
             onClick={handleClear}
-            aria-label="Clear search"
+            aria-label={t('search.clear')}
           >
             &times;
           </button>
         )}
       </div>
       <button type="submit" className="search-bar__btn" disabled={!query.trim()}>
-        Search
+        {t('search.button')}
       </button>
     </form>
   );
-}
+});
+
+export default SearchBar;

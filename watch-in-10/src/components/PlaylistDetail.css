@@ -1,0 +1,66 @@
+.playlist-detail__back {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: none;
+  margin-bottom: 12px;
+}
+
+.playlist-detail__back:hover {
+  text-decoration: underline;
+}
+
+.playlist-detail__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.playlist-detail__count {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: 16px;
+}
+
+.playlist-detail__empty {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: 0.85rem;
+  margin-top: 24px;
+}
+
+.playlist-detail__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.playlist-detail__item {
+  position: relative;
+}
+
+.playlist-detail__remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  color: var(--color-error);
+  background: var(--color-surface);
+  border: 1px solid var(--color-error);
+  border-radius: 100px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.playlist-detail__item:hover .playlist-detail__remove {
+  opacity: 1;
+}
+
+.playlist-detail__remove:hover {
+  background: var(--color-error);
+  color: white;
+}

@@ -1,11 +1,11 @@
+import { useI18n } from '../hooks/useI18n';
 import './Footer.css';
 
 export default function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="footer">
-      <p>
-        Built for those in-between moments
-      </p>
+      <p>{t('footer.text')}</p>
     </footer>
   );
 }

@@ -1,12 +1,16 @@
 import { useState, useCallback } from 'react';
 import { fetchVideos, searchByQuery } from '../services/youtube';
 import { fallbackVideos } from '../data/fallback';
+import { useSearchCache } from './useSearchCache';
+import { useI18n } from './useI18n';
 
 export function useYouTube() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [usingFallback, setUsingFallback] = useState(false);
+  const { get: getCache, set: setCache } = useSearchCache();
+  const { locale, t } = useI18n();
 
   const search = useCallback(async (mood, maxMinutes) => {
     setVideos([]);
@@ -14,44 +18,60 @@ export function useYouTube() {
     setError(null);
     setUsingFallback(false);
 
+    const cached = getCache('mood', mood.id, maxMinutes);
+    if (cached) {
+      setVideos(cached);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const results = await fetchVideos(mood, maxMinutes);
+      const results = await fetchVideos(mood, maxMinutes, locale);
 
       if (results.length === 0) {
-        // All proxy instances failed or no matches — use fallback data
-        const minSeconds = Math.max(0, (maxMinutes - 3) * 60);
-        const maxSeconds = (maxMinutes + 2) * 60;
-        const fb = (fallbackVideos[mood.id] || []).filter(
-          (v) => v.durationSeconds >= minSeconds && v.durationSeconds <= maxSeconds
-        );
+        const anyDuration = maxMinutes === 'any';
+        const fb = (fallbackVideos[mood.id] || []).filter((v) => {
+          if (anyDuration) return true;
+          const minSeconds = Math.max(0, (maxMinutes - 3) * 60);
+          const maxSeconds = (maxMinutes + 2) * 60;
+          return v.durationSeconds >= minSeconds && v.durationSeconds <= maxSeconds;
+        });
 
         if (fb.length > 0) {
           setVideos(fb);
           setUsingFallback(true);
         } else {
-          setError('No videos found for this mood and duration. Try a different combination!');
+          setError(t('error.noMoodVideos'));
         }
       } else {
         setVideos(results);
+        setCache('mood', mood.id, maxMinutes, results);
+        try { localStorage.setItem('watch10-last-results', JSON.stringify(results)); } catch { /* */ }
       }
     } catch (err) {
       console.error('Video search error:', err);
-      // Fall back to sample data on error
-      const minSeconds = Math.max(0, (maxMinutes - 1) * 60);
-      const maxSeconds = (maxMinutes + 1) * 60;
-      const fb = (fallbackVideos[mood.id] || []).filter(
-        (v) => v.durationSeconds >= minSeconds && v.durationSeconds <= maxSeconds
-      );
+      // Try offline localStorage fallback first
+      try {
+        const offline = JSON.parse(localStorage.getItem('watch10-last-results'));
+        if (offline?.length) { setVideos(offline); setUsingFallback(true); setLoading(false); return; }
+      } catch { /* */ }
+      const anyDuration = maxMinutes === 'any';
+      const fb = (fallbackVideos[mood.id] || []).filter((v) => {
+        if (anyDuration) return true;
+        const minSeconds = Math.max(0, (maxMinutes - 1) * 60);
+        const maxSeconds = (maxMinutes + 1) * 60;
+        return v.durationSeconds >= minSeconds && v.durationSeconds <= maxSeconds;
+      });
       if (fb.length > 0) {
         setVideos(fb);
         setUsingFallback(true);
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(t('error.generic'));
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getCache, setCache, locale, t]);
 
   const searchQuery = useCallback(async (query, maxMinutes) => {
     setVideos([]);
@@ -59,21 +79,34 @@ export function useYouTube() {
     setError(null);
     setUsingFallback(false);
 
+    const cached = getCache('query', query, maxMinutes);
+    if (cached) {
+      setVideos(cached);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const results = await searchByQuery(query, maxMinutes);
+      const results = await searchByQuery(query, maxMinutes, locale);
 
       if (results.length === 0) {
-        setError('No videos found for that search. Try different keywords or duration!');
+        setError(t('error.noSearchVideos'));
       } else {
         setVideos(results);
+        setCache('query', query, maxMinutes, results);
+        try { localStorage.setItem('watch10-last-results', JSON.stringify(results)); } catch { /* */ }
       }
     } catch (err) {
       console.error('Video search error:', err);
-      setError('Something went wrong. Please try again.');
+      try {
+        const offline = JSON.parse(localStorage.getItem('watch10-last-results'));
+        if (offline?.length) { setVideos(offline); setUsingFallback(true); setLoading(false); return; }
+      } catch { /* */ }
+      setError(t('error.generic'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getCache, setCache, locale, t]);
 
   const reset = useCallback(() => {
     setVideos([]);

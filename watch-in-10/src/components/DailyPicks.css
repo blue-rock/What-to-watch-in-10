@@ -1,0 +1,39 @@
+.daily-picks {
+  max-width: var(--max-width);
+  margin: 0 auto 32px;
+  padding: 0 20px;
+}
+
+.daily-picks__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.daily-picks__subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.daily-picks__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .daily-picks__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-picks__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

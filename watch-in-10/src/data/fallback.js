@@ -234,12 +234,12 @@ export const fallbackVideos = {
   comedy: [
     {
       id: 'fb-25',
-      title: 'Trevor Noah — Best Stand-Up Moments',
-      channel: 'Comedy Central',
-      thumbnail: 'https://i.ytimg.com/vi/WzEhoyXpqzQ/hqdefault.jpg',
-      durationSeconds: 600,
-      viewCount: 10000000,
-      url: 'https://www.youtube.com/watch?v=WzEhoyXpqzQ',
+      title: 'Vir Das — Two Indias | Netflix Comedy Special',
+      channel: 'Netflix Is A Joke',
+      thumbnail: 'https://i.ytimg.com/vi/sM7jNl_wJso/hqdefault.jpg',
+      durationSeconds: 480,
+      viewCount: 8000000,
+      url: 'https://www.youtube.com/watch?v=sM7jNl_wJso',
     },
     {
       id: 'fb-26',

@@ -104,6 +104,111 @@
   gap: 16px;
 }
 
+.favorites-panel__header-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.favorites-panel__tab {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Playlist create row */
+.favorites-panel__playlist-create {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.favorites-panel__playlist-input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.favorites-panel__playlist-add-btn {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+
+.favorites-panel__playlist-add-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.favorites-panel__playlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.favorites-panel__playlist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  transition: background var(--transition);
+}
+
+.favorites-panel__playlist-item:hover {
+  background: var(--color-accent-light);
+}
+
+.favorites-panel__playlist-name {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.favorites-panel__playlist-count {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+}
+
+.favorites-panel__playlist-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.favorites-panel__playlist-action {
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  background: none;
+  color: var(--color-text-secondary);
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+
+.favorites-panel__playlist-action:hover {
+  background: var(--color-border);
+}
+
+.favorites-panel__playlist-action--delete:hover {
+  color: var(--color-error);
+}
+
 @media (max-width: 480px) {
   .favorites-panel {
     width: 100vw;
