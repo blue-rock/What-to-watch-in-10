@@ -113,6 +113,12 @@
 }
 
 .app__share-btn {
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  border-radius: 100px;
+  transition: all var(--transition);
   color: var(--color-accent);
   background: var(--color-accent-light);
 }

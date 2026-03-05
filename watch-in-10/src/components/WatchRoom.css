@@ -383,6 +383,136 @@
   text-transform: uppercase;
 }
 
+/* Video Chat */
+.watch-room__videochat-btn {
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+
+.watch-room__videochat-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.watch-room__videochat-btn--active {
+  color: white;
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.watch-room__videochat-btn--active:hover {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: white;
+}
+
+.watch-room__video-preview {
+  margin-bottom: 12px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+}
+
+.watch-room__local-video {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius);
+  transform: scaleX(-1);
+}
+
+/* Chat */
+.watch-room__chat-title {
+  margin-top: 20px;
+}
+
+.watch-room__chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.watch-room__chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+  max-height: 300px;
+}
+
+.watch-room__chat-empty {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin: 8px 0;
+}
+
+.watch-room__chat-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.watch-room__chat-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.watch-room__chat-text {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.watch-room__chat-form {
+  display: flex;
+  gap: 4px;
+}
+
+.watch-room__chat-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.watch-room__chat-input:focus {
+  border-color: var(--color-accent);
+}
+
+.watch-room__chat-send {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+
+.watch-room__chat-send:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.watch-room__chat-send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* Reactions bar */
 .watch-room__reactions-bar {
   display: flex;

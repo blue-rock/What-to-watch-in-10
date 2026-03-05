@@ -596,11 +596,14 @@ export default function App() {
           isHost={room.isHost}
           participants={room.participants}
           reactions={room.reactions}
+          messages={room.messages}
           userId={room.userId}
           onSyncPlayback={room.syncPlayback}
           onSendReaction={room.sendReaction}
+          onSendMessage={room.sendMessage}
           onSetVideo={room.setVideo}
           onLeave={handleLeaveRoom}
+          onChannelClick={handleChannelClick}
         />
       )}
 

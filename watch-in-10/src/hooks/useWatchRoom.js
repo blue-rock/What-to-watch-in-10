@@ -38,6 +38,7 @@ export function useWatchRoom() {
   const [isHost, setIsHost] = useState(false);
   const [participants, setParticipants] = useState({});
   const [reactions, setReactions] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const uid = useRef(getUserId());
   const configured = isFirebaseConfigured();
@@ -104,6 +105,7 @@ export function useWatchRoom() {
     setIsHost(false);
     setParticipants({});
     setReactions([]);
+    setMessages([]);
     setError(null);
   }, [configured, roomId, isHost]);
 
@@ -134,6 +136,15 @@ export function useWatchRoom() {
     });
   }, [configured, roomId]);
 
+  const sendMessage = useCallback(async (text) => {
+    if (!configured || !roomId || !text.trim()) return;
+    const db = getFirebaseDB();
+    const name = localStorage.getItem('watch10-user-name') || 'Guest';
+    await push(ref(db, `rooms/${roomId}/messages`), {
+      text: text.trim(), userId: uid.current, name, timestamp: Date.now(),
+    });
+  }, [configured, roomId]);
+
   // Listen to room data
   useEffect(() => {
     if (!configured || !roomId) return;
@@ -147,6 +158,7 @@ export function useWatchRoom() {
         setIsHost(false);
         setParticipants({});
         setReactions([]);
+        setMessages([]);
         return;
       }
       const data = snapshot.val();
@@ -158,6 +170,11 @@ export function useWatchRoom() {
         .map(([key, val]) => ({ key, ...val }))
         .filter((r) => now - r.timestamp < 4000);
       setReactions(reactionList);
+
+      const messageList = Object.entries(data.messages || {})
+        .map(([key, val]) => ({ key, ...val }))
+        .sort((a, b) => a.timestamp - b.timestamp);
+      setMessages(messageList);
     });
 
     return () => off(roomRef);
@@ -184,8 +201,8 @@ export function useWatchRoom() {
   }, [configured, roomId, isHost]);
 
   return {
-    roomId, roomData, isHost, participants, reactions, error,
+    roomId, roomData, isHost, participants, reactions, messages, error,
     userId: uid.current, configured,
-    createRoom, joinRoom, leaveRoom, setVideo, syncPlayback, sendReaction,
+    createRoom, joinRoom, leaveRoom, setVideo, syncPlayback, sendReaction, sendMessage,
   };
 }

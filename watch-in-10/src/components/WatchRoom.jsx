@@ -24,8 +24,8 @@ function loadYTApi() {
 }
 
 export default function WatchRoom({
-  roomId, roomData, isHost, participants, reactions, userId,
-  onSyncPlayback, onSendReaction, onSetVideo, onLeave,
+  roomId, roomData, isHost, participants, reactions, messages, userId,
+  onSyncPlayback, onSendReaction, onSetVideo, onLeave, onChannelClick, onSendMessage,
 }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
@@ -33,6 +33,11 @@ export default function WatchRoom({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [chatMsg, setChatMsg] = useState('');
+  const [videoChatOn, setVideoChatOn] = useState(false);
+  const [localStream, setLocalStream] = useState(null);
+  const localVideoRef = useRef(null);
+  const chatEndRef = useRef(null);
   const ytPlayerRef = useRef(null);
   const suppressRef = useRef(false);
   const lastSyncRef = useRef(null);
@@ -148,6 +153,50 @@ export default function WatchRoom({
     setSearchQuery('');
   };
 
+  // Auto-scroll chat to bottom when new messages arrive
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSendChat = (e) => {
+    e.preventDefault();
+    if (!chatMsg.trim()) return;
+    onSendMessage(chatMsg);
+    setChatMsg('');
+  };
+
+  const toggleVideoChat = async () => {
+    if (videoChatOn && localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+      setVideoChatOn(false);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setLocalStream(stream);
+        setVideoChatOn(true);
+      } catch {
+        // User denied or no camera available
+      }
+    }
+  };
+
+  // Attach local stream to video element
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  // Cleanup stream on unmount
+  useEffect(() => {
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [localStream]);
+
   const participantList = Object.entries(participants);
 
   return (
@@ -164,6 +213,13 @@ export default function WatchRoom({
           </span>
         </div>
         <div className="watch-room__header-actions">
+          <button
+            className={`watch-room__videochat-btn ${videoChatOn ? 'watch-room__videochat-btn--active' : ''}`}
+            onClick={toggleVideoChat}
+            title={videoChatOn ? t('room.videoChatOff') : t('room.videoChatOn')}
+          >
+            {videoChatOn ? t('room.videoChatOff') : t('room.videoChatOn')}
+          </button>
           {isHost && video && (
             <button className="watch-room__change-btn" onClick={() => setShowSearch(!showSearch)}>
               {t('room.changeVideo')}
@@ -245,23 +301,24 @@ export default function WatchRoom({
           {video && (
             <div className="watch-room__video-info">
               <h3>{video.title}</h3>
-              {isHost ? (
-                <button
-                  className="watch-room__channel-link"
-                  onClick={() => handleChannelClick(video.channel)}
-                  title={t('channel.viewChannel')}
-                >
-                  {video.channel}
-                </button>
-              ) : (
-                <p>{video.channel}</p>
-              )}
+              <button
+                className="watch-room__channel-link"
+                onClick={() => onChannelClick ? onChannelClick(video.channel, video.channelId) : handleChannelClick(video.channel)}
+                title={t('channel.viewChannel')}
+              >
+                {video.channel}
+              </button>
             </div>
           )}
         </div>
 
         {/* Sidebar */}
         <div className="watch-room__sidebar">
+          {videoChatOn && localStream && (
+            <div className="watch-room__video-preview">
+              <video ref={localVideoRef} autoPlay muted playsInline className="watch-room__local-video" />
+            </div>
+          )}
           <h4 className="watch-room__sidebar-title">{t('room.participants')}</h4>
           <div className="watch-room__participant-list">
             {participantList.map(([id, p]) => (
@@ -275,6 +332,38 @@ export default function WatchRoom({
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Chat */}
+          <h4 className="watch-room__sidebar-title watch-room__chat-title">{t('room.chat')}</h4>
+          <div className="watch-room__chat">
+            <div className="watch-room__chat-messages">
+              {(!messages || messages.length === 0) && (
+                <p className="watch-room__chat-empty">{t('room.chatEmpty')}</p>
+              )}
+              {messages && messages.map((msg) => (
+                <div key={msg.key} className="watch-room__chat-msg">
+                  <span className="watch-room__chat-name" style={{ color: participants[msg.userId]?.color || '#888' }}>
+                    {msg.name}
+                  </span>
+                  <span className="watch-room__chat-text">{msg.text}</span>
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+            <form className="watch-room__chat-form" onSubmit={handleSendChat}>
+              <input
+                type="text"
+                className="watch-room__chat-input"
+                value={chatMsg}
+                onChange={(e) => setChatMsg(e.target.value)}
+                placeholder={t('room.chatPlaceholder')}
+                maxLength={200}
+              />
+              <button type="submit" className="watch-room__chat-send" disabled={!chatMsg.trim()}>
+                {t('room.chatSend')}
+              </button>
+            </form>
           </div>
         </div>
       </div>

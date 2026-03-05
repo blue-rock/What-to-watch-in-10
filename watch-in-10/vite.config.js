@@ -340,4 +340,9 @@ function youtubeSearchPlugin() {
 
 export default defineConfig({
   plugins: [react(), youtubeSearchPlugin()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    globals: true,
+  },
 })
