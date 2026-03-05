@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { fetchChannel } from '../services/youtube';
+import { fetchChannel, fetchChannelMore } from '../services/youtube';
 import { formatDuration } from '../utils/duration';
 import { useI18n } from '../hooks/useI18n';
 import './ChannelPage.css';
@@ -8,21 +8,56 @@ export default function ChannelPage({ channelId, channelName, onClose, onPlay })
   const { t, locale } = useI18n();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [continuation, setContinuation] = useState(null);
+  const [allVideos, setAllVideos] = useState([]);
   const [playingVideo, setPlayingVideo] = useState(null);
   const playerRef = useRef(null);
   const containerRef = useRef(null);
+  const sentinelRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setAllVideos([]);
+    setContinuation(null);
     fetchChannel(channelId, locale).then((data) => {
       if (!cancelled) {
         setChannel(data);
+        setAllVideos(data?.videos || []);
+        setContinuation(data?.continuation || null);
         setLoading(false);
       }
     });
     return () => { cancelled = true; };
   }, [channelId, locale]);
+
+  // Infinite scroll — load more videos when sentinel enters viewport
+  const loadMore = useCallback(async () => {
+    if (!continuation || loadingMore) return;
+    setLoadingMore(true);
+    const data = await fetchChannelMore(continuation, locale);
+    if (data) {
+      setAllVideos((prev) => {
+        const ids = new Set(prev.map((v) => v.id));
+        const newVideos = (data.videos || []).filter((v) => !ids.has(v.id));
+        return [...prev, ...newVideos];
+      });
+      setContinuation(data.continuation || null);
+    }
+    setLoadingMore(false);
+  }, [continuation, loadingMore, locale]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !continuation) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { rootMargin: '400px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [continuation, loadMore]);
 
   // YouTube IFrame Player
   useEffect(() => {
@@ -77,7 +112,6 @@ export default function ChannelPage({ channelId, channelName, onClose, onPlay })
   const banner = channel?.banner || '';
   const handle = channel?.handle || '';
   const subscriberCount = channel?.subscriberCount || '';
-  const videos = channel?.videos || [];
 
   return (
     <div className="channel-page">
@@ -142,40 +176,57 @@ export default function ChannelPage({ channelId, channelName, onClose, onPlay })
               ))}
             </div>
           </div>
-        ) : videos.length > 0 ? (
-          <div className="channel-page__grid">
-            {videos.map((video) => (
-              <button
-                key={video.id}
-                className={`channel-page__video-card ${playingVideo?.id === video.id ? 'channel-page__video-card--active' : ''}`}
-                onClick={() => handlePlayVideo(video)}
-              >
-                <div className="channel-page__thumb-wrap">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="channel-page__thumb"
-                    loading="lazy"
-                  />
-                  {video.durationSeconds > 0 && (
-                    <span className="channel-page__duration">
-                      {formatDuration(video.durationSeconds)}
-                    </span>
-                  )}
-                  {playingVideo?.id === video.id && (
-                    <div className="channel-page__now-playing">Now Playing</div>
-                  )}
-                </div>
-                <div className="channel-page__video-info">
-                  <h3 className="channel-page__video-title">{video.title}</h3>
-                  <p className="channel-page__video-meta">
-                    {video.viewCount > 0 && `${video.viewCount.toLocaleString()} views`}
-                    {video.publishedAt && ` \u00B7 ${video.publishedAt}`}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
+        ) : allVideos.length > 0 ? (
+          <>
+            <div className="channel-page__grid">
+              {allVideos.map((video) => (
+                <button
+                  key={video.id}
+                  className={`channel-page__video-card ${playingVideo?.id === video.id ? 'channel-page__video-card--active' : ''}`}
+                  onClick={() => handlePlayVideo(video)}
+                >
+                  <div className="channel-page__thumb-wrap">
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="channel-page__thumb"
+                      loading="lazy"
+                    />
+                    {video.durationSeconds > 0 && (
+                      <span className="channel-page__duration">
+                        {formatDuration(video.durationSeconds)}
+                      </span>
+                    )}
+                    {playingVideo?.id === video.id && (
+                      <div className="channel-page__now-playing">Now Playing</div>
+                    )}
+                  </div>
+                  <div className="channel-page__video-info">
+                    <h3 className="channel-page__video-title">{video.title}</h3>
+                    <p className="channel-page__video-meta">
+                      {video.viewCount > 0 && `${video.viewCount.toLocaleString()} views`}
+                      {video.publishedAt && ` \u00B7 ${video.publishedAt}`}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            {continuation && (
+              <div ref={sentinelRef} className="channel-page__load-more">
+                {loadingMore && (
+                  <div className="channel-page__skeleton-grid">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="channel-page__skeleton-card">
+                        <div className="channel-page__skeleton-thumb" />
+                        <div className="channel-page__skeleton-title" />
+                        <div className="channel-page__skeleton-sub" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <p className="channel-page__empty">{t('channel.noVideos')}</p>
         )}

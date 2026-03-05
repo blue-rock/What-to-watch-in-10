@@ -266,6 +266,12 @@
   font-size: 1rem;
 }
 
+/* Load more sentinel */
+.channel-page__load-more {
+  margin-top: 20px;
+  min-height: 1px;
+}
+
 /* Skeleton loading */
 .channel-page__skeleton-grid {
   display: grid;

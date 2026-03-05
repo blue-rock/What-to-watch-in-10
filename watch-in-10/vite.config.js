@@ -61,9 +61,31 @@ function extractVideos(data) {
   return videos;
 }
 
+/** Extract videos + continuation token from a continuation response. */
+function extractContinuationVideos(data) {
+  const result = { videos: [], continuation: null };
+  try {
+    const actions = data?.onResponseReceivedActions || [];
+    for (const action of actions) {
+      const items = action?.appendContinuationItemsAction?.continuationItems || [];
+      for (const item of items) {
+        const vr = item?.richItemRenderer?.content?.videoRenderer;
+        if (vr) { addChannelVideo(result.videos, vr); continue; }
+        const lvm = item?.richItemRenderer?.content?.lockupViewModel;
+        if (lvm) { addChannelVideoFromLockup(result.videos, lvm); continue; }
+        const cont = item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+        if (cont) result.continuation = cont;
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing continuation response:', e);
+  }
+  return result;
+}
+
 /** Extract channel data from YouTube's internal browse response. */
 function extractChannelData(headerData, videosData) {
-  const result = { name: '', handle: '', avatar: '', banner: '', subscriberCount: '', videos: [] };
+  const result = { name: '', handle: '', avatar: '', banner: '', subscriberCount: '', videos: [], continuation: null };
   try {
     const data = headerData || videosData;
     const header = data?.header?.c4TabbedHeaderRenderer;
@@ -103,7 +125,9 @@ function extractChannelData(headerData, videosData) {
         const vr = item?.richItemRenderer?.content?.videoRenderer;
         if (vr) { addChannelVideo(result.videos, vr); continue; }
         const lvm = item?.richItemRenderer?.content?.lockupViewModel;
-        if (lvm) addChannelVideoFromLockup(result.videos, lvm);
+        if (lvm) { addChannelVideoFromLockup(result.videos, lvm); continue; }
+        const cont = item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+        if (cont) result.continuation = cont;
       }
       if (result.videos.length === 0) {
         const sections = tabContent?.sectionListRenderer?.contents || [];
@@ -183,28 +207,45 @@ function youtubeSearchPlugin() {
       server.middlewares.use('/api/channel', async (req, res) => {
         const url = new URL(req.url, 'http://localhost');
         const channelId = url.searchParams.get('channelId');
+        const continuation = url.searchParams.get('continuation');
         const hl = url.searchParams.get('hl') || 'en';
 
-        if (!channelId) {
+        if (!channelId && !continuation) {
           res.statusCode = 400;
-          res.end(JSON.stringify({ error: 'Missing "channelId" query parameter' }));
+          res.end(JSON.stringify({ error: 'Missing "channelId" or "continuation" query parameter' }));
           return;
         }
 
-        const clientCtx = {
-          context: {
-            client: {
-              clientName: 'WEB',
-              clientVersion: '2.20250227.00.00',
-              hl,
-              gl: 'US',
-            },
-          },
-          browseId: channelId,
+        const clientContext = {
+          clientName: 'WEB',
+          clientVersion: '2.20250227.00.00',
+          hl,
+          gl: 'US',
         };
 
         try {
-          // Fetch header and latest videos in parallel
+          // Continuation request — load next page of videos
+          if (continuation) {
+            const contRes = await fetch(YOUTUBE_BROWSE_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ context: { client: clientContext }, continuation }),
+            });
+            if (!contRes.ok) {
+              res.statusCode = contRes.status;
+              res.end(JSON.stringify({ error: `YouTube returned ${contRes.status}` }));
+              return;
+            }
+            const contData = await contRes.json();
+            const page = extractContinuationVideos(contData);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(page));
+            return;
+          }
+
+          // Initial request — fetch header + latest videos in parallel
+          const clientCtx = { context: { client: clientContext }, browseId: channelId };
+
           const [headerRes, videosRes] = await Promise.all([
             fetch(YOUTUBE_BROWSE_API, {
               method: 'POST',

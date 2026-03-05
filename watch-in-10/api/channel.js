@@ -12,27 +12,42 @@
 const YOUTUBE_BROWSE_API = 'https://www.youtube.com/youtubei/v1/browse?prettyPrint=false';
 
 export default async function handler(req, res) {
-  const { channelId, hl } = req.query || {};
+  const { channelId, hl, continuation } = req.query || {};
 
-  if (!channelId) {
-    res.status(400).json({ error: 'Missing "channelId" query parameter' });
+  if (!channelId && !continuation) {
+    res.status(400).json({ error: 'Missing "channelId" or "continuation" query parameter' });
     return;
   }
 
-  const clientCtx = {
-    context: {
-      client: {
-        clientName: 'WEB',
-        clientVersion: '2.20250227.00.00',
-        hl: hl || 'en',
-        gl: 'US',
-      },
-    },
-    browseId: channelId,
+  const clientContext = {
+    clientName: 'WEB',
+    clientVersion: '2.20250227.00.00',
+    hl: hl || 'en',
+    gl: 'US',
   };
 
   try {
-    // Fetch header (default browse) and latest videos (Videos tab sorted by date) in parallel
+    // Continuation request — load next page of videos
+    if (continuation) {
+      const contRes = await fetch(YOUTUBE_BROWSE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context: { client: clientContext }, continuation }),
+      });
+      if (!contRes.ok) {
+        res.status(contRes.status).json({ error: `YouTube returned ${contRes.status}` });
+        return;
+      }
+      const contData = await contRes.json();
+      const page = extractContinuationVideos(contData);
+      res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+      res.status(200).json(page);
+      return;
+    }
+
+    // Initial request — fetch header + latest videos in parallel
+    const clientCtx = { context: { client: clientContext }, browseId: channelId };
+
     const [headerRes, videosRes] = await Promise.all([
       fetch(YOUTUBE_BROWSE_API, {
         method: 'POST',
@@ -66,6 +81,28 @@ export default async function handler(req, res) {
   }
 }
 
+/** Extract videos + continuation token from a continuation response. */
+function extractContinuationVideos(data) {
+  const result = { videos: [], continuation: null };
+  try {
+    const actions = data?.onResponseReceivedActions || [];
+    for (const action of actions) {
+      const items = action?.appendContinuationItemsAction?.continuationItems || [];
+      for (const item of items) {
+        const vr = item?.richItemRenderer?.content?.videoRenderer;
+        if (vr) { addVideo(result.videos, vr); continue; }
+        const lvm = item?.richItemRenderer?.content?.lockupViewModel;
+        if (lvm) { addVideoFromLockup(result.videos, lvm); continue; }
+        const cont = item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+        if (cont) result.continuation = cont;
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing continuation response:', e);
+  }
+  return result;
+}
+
 function extractChannelData(headerData, videosData) {
   const result = {
     name: '',
@@ -74,6 +111,7 @@ function extractChannelData(headerData, videosData) {
     banner: '',
     subscriberCount: '',
     videos: [],
+    continuation: null,
   };
 
   try {
@@ -122,7 +160,10 @@ function extractChannelData(headerData, videosData) {
           if (vr) { addVideo(result.videos, vr); continue; }
           // Newer lockupViewModel format
           const lvm = item?.richItemRenderer?.content?.lockupViewModel;
-          if (lvm) addVideoFromLockup(result.videos, lvm);
+          if (lvm) { addVideoFromLockup(result.videos, lvm); continue; }
+          // Continuation token
+          const cont = item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+          if (cont) result.continuation = cont;
         }
 
         if (result.videos.length === 0) {

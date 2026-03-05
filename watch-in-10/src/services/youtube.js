@@ -222,3 +222,17 @@ export async function fetchChannel(channelId, hl = 'en') {
     return null;
   }
 }
+
+/**
+ * Fetch the next page of channel videos using a continuation token.
+ * Returns { videos: [...], continuation: string|null }
+ */
+export async function fetchChannelMore(continuation, hl = 'en') {
+  try {
+    const res = await fetch(`/api/channel?continuation=${encodeURIComponent(continuation)}&hl=${hl}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
