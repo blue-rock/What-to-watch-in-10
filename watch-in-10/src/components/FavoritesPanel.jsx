@@ -18,6 +18,7 @@ export default function FavoritesPanel({
   onDeletePlaylist,
   onRenamePlaylist,
   onRemoveFromPlaylist,
+  onChannelClick,
 }) {
   const { t } = useI18n();
   const [tab, setTab] = useState('favorites');
@@ -68,6 +69,7 @@ export default function FavoritesPanel({
               onToggleFavorite={onToggleFavorite}
               isFavorite={isFavorite}
               onRemoveFromPlaylist={onRemoveFromPlaylist}
+              onChannelClick={onChannelClick}
             />
           </div>
         </div>
@@ -187,6 +189,7 @@ export default function FavoritesPanel({
                     onPlay={onPlay}
                     onToggleFavorite={onToggleFavorite}
                     isFavorited={isFavorite(video.id)}
+                    onChannelClick={onChannelClick}
                   />
                 ))}
               </div>

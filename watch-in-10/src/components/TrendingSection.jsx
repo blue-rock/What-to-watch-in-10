@@ -7,7 +7,7 @@ import './TrendingSection.css';
 const CACHE_KEY = 'watch10-trending';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
-export default function TrendingSection({ onPlay, onToggleFavorite, isFavorite }) {
+export default function TrendingSection({ onPlay, onToggleFavorite, isFavorite, onChannelClick }) {
   const { t } = useI18n();
   const [videos, setVideos] = useState([]);
   const scrollRef = useRef(null);
@@ -56,6 +56,7 @@ export default function TrendingSection({ onPlay, onToggleFavorite, isFavorite }
                 onPlay={onPlay}
                 onToggleFavorite={onToggleFavorite}
                 isFavorited={isFavorite?.(video.id)}
+                onChannelClick={onChannelClick}
               />
             </div>
           ))}

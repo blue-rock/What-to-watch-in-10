@@ -118,16 +118,27 @@ export default function WatchRoom({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
+  const doSearch = async (query) => {
+    if (!query.trim()) return;
     setSearching(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&duration=medium`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&duration=medium`);
       const data = await res.json();
       setSearchResults(data.items || []);
     } catch { setSearchResults([]); }
     setSearching(false);
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    doSearch(searchQuery);
+  };
+
+  const handleChannelClick = (channelName) => {
+    if (!isHost) return;
+    setSearchQuery(channelName);
+    setShowSearch(true);
+    doSearch(channelName);
   };
 
   const handleSelectVideo = (v) => {
@@ -180,6 +191,44 @@ export default function WatchRoom({
                   </span>
                 ))}
               </div>
+              {/* Host search overlay on top of video */}
+              {showSearch && isHost && (
+                <div className="watch-room__search-overlay">
+                  <form onSubmit={handleSearch} className="watch-room__search-form">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t('room.searchPlaceholder')}
+                      className="watch-room__search-input"
+                      autoFocus
+                    />
+                    <button type="submit" className="watch-room__search-submit" disabled={searching}>
+                      {searching ? '...' : t('search.button')}
+                    </button>
+                    <button
+                      type="button"
+                      className="watch-room__search-close"
+                      onClick={() => { setShowSearch(false); setSearchResults([]); }}
+                    >
+                      {'\u2715'}
+                    </button>
+                  </form>
+                  {searchResults.length > 0 && (
+                    <div className="watch-room__search-results">
+                      {searchResults.slice(0, 8).map((v) => (
+                        <button key={v.id} className="watch-room__search-item" onClick={() => handleSelectVideo(v)}>
+                          <img src={v.thumbnail} alt="" className="watch-room__search-thumb" />
+                          <div className="watch-room__search-meta">
+                            <span className="watch-room__search-title">{v.title}</span>
+                            <span className="watch-room__search-channel">{v.channel}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="watch-room__empty-player">
@@ -196,45 +245,16 @@ export default function WatchRoom({
           {video && (
             <div className="watch-room__video-info">
               <h3>{video.title}</h3>
-              <p>{video.channel}</p>
-            </div>
-          )}
-
-          {/* Host search panel */}
-          {showSearch && isHost && (
-            <div className="watch-room__search-panel">
-              <form onSubmit={handleSearch} className="watch-room__search-form">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('room.searchPlaceholder')}
-                  className="watch-room__search-input"
-                  autoFocus
-                />
-                <button type="submit" className="watch-room__search-submit" disabled={searching}>
-                  {searching ? '...' : t('search.button')}
-                </button>
+              {isHost ? (
                 <button
-                  type="button"
-                  className="watch-room__search-close"
-                  onClick={() => { setShowSearch(false); setSearchResults([]); }}
+                  className="watch-room__channel-link"
+                  onClick={() => handleChannelClick(video.channel)}
+                  title={t('channel.viewChannel')}
                 >
-                  {'\u2715'}
+                  {video.channel}
                 </button>
-              </form>
-              {searchResults.length > 0 && (
-                <div className="watch-room__search-results">
-                  {searchResults.slice(0, 8).map((v) => (
-                    <button key={v.id} className="watch-room__search-item" onClick={() => handleSelectVideo(v)}>
-                      <img src={v.thumbnail} alt="" className="watch-room__search-thumb" />
-                      <div className="watch-room__search-meta">
-                        <span className="watch-room__search-title">{v.title}</span>
-                        <span className="watch-room__search-channel">{v.channel}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+              ) : (
+                <p>{video.channel}</p>
               )}
             </div>
           )}

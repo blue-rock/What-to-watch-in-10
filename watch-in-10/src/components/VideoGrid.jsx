@@ -17,6 +17,7 @@ export default function VideoGrid({
   onAddToQueue,
   onShare,
   onDismiss,
+  onChannelClick,
 }) {
   const { t } = useI18n();
   const sentinelRef = useRef(null);
@@ -56,6 +57,7 @@ export default function VideoGrid({
             onAddToQueue={onAddToQueue}
             onShare={onShare}
             onDismiss={onDismiss}
+            onChannelClick={onChannelClick}
           />
         ))}
       </div>
@@ -64,7 +66,7 @@ export default function VideoGrid({
   );
 }
 
-function SwipeableCard({ video, index, onPlay, onToggleFavorite, isFavorited, playlists, onAddToPlaylist, onAddToQueue, onShare, onDismiss }) {
+function SwipeableCard({ video, index, onPlay, onToggleFavorite, isFavorited, playlists, onAddToPlaylist, onAddToQueue, onShare, onDismiss, onChannelClick }) {
   const { onTouchStart, onTouchEnd } = useSwipe({
     onSwipeRight: () => onToggleFavorite?.(video),
     onSwipeLeft: () => onDismiss?.(video.id),
@@ -82,6 +84,7 @@ function SwipeableCard({ video, index, onPlay, onToggleFavorite, isFavorited, pl
         onAddToPlaylist={onAddToPlaylist}
         onAddToQueue={onAddToQueue}
         onShare={onShare}
+        onChannelClick={onChannelClick}
       />
     </div>
   );

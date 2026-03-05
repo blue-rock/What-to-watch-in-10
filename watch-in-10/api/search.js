@@ -100,6 +100,8 @@ function extractVideos(data) {
           id: vr.videoId,
           title: vr.title?.runs?.[0]?.text || '',
           channel: vr.ownerText?.runs?.[0]?.text || '',
+          channelId: vr.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '',
+          channelAvatar: vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '',
           thumbnail:
             vr.thumbnail?.thumbnails?.slice(-1)?.[0]?.url ||
             `https://i.ytimg.com/vi/${vr.videoId}/hqdefault.jpg`,

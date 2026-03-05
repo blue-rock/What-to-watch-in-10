@@ -27,7 +27,7 @@ function loadYTApi() {
   return apiPromise;
 }
 
-export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVideos, onPlayRelated, onVideoEnd, onWatchTogether }) {
+export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVideos, onPlayRelated, onVideoEnd, onWatchTogether, onChannelClick }) {
   const { t } = useI18n();
   const overlayRef = useRef(null);
   const closeRef = useRef(null);
@@ -168,7 +168,17 @@ export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVi
           )}
         </div>
         <p className="video-modal__title">{video.title}</p>
-        <p className="video-modal__channel">{video.channel}</p>
+        {onChannelClick ? (
+          <button
+            className="video-modal__channel video-modal__channel--link"
+            onClick={() => { onChannelClick(video.channel, video.channelId); onClose(); }}
+            title={t('channel.viewChannel')}
+          >
+            {video.channel}
+          </button>
+        ) : (
+          <p className="video-modal__channel">{video.channel}</p>
+        )}
 
         {relatedVideos && relatedVideos.length > 0 && (
           <div className="video-modal__related">

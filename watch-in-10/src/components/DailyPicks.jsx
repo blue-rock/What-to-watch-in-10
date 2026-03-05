@@ -28,7 +28,7 @@ async function checkVideo(video) {
   }
 }
 
-export default function DailyPicks({ onPlay, onToggleFavorite, isFavorite }) {
+export default function DailyPicks({ onPlay, onToggleFavorite, isFavorite, onChannelClick }) {
   const { t } = useI18n();
   // Generate a larger pool of candidates using today's seed
   const candidates = useMemo(() => {
@@ -92,6 +92,7 @@ export default function DailyPicks({ onPlay, onToggleFavorite, isFavorite }) {
               onPlay={onPlay}
               onToggleFavorite={onToggleFavorite}
               isFavorited={isFavorite?.(video.id)}
+              onChannelClick={onChannelClick}
             />
           ))}
         </div>

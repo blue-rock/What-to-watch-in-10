@@ -208,3 +208,17 @@ export async function searchByQuery(query, maxMinutes, hl = 'en') {
   const cleaned = filtered.slice(0, 9).map(({ tags, ...video }) => video);
   return checkAvailability(cleaned);
 }
+
+/**
+ * Fetch a YouTube channel's page: banner, avatar, name, subscriber count, and videos.
+ * Uses the /api/channel proxy which calls YouTube's internal browse API.
+ */
+export async function fetchChannel(channelId, hl = 'en') {
+  try {
+    const res = await fetch(`/api/channel?channelId=${encodeURIComponent(channelId)}&hl=${hl}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

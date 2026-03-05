@@ -14,6 +14,7 @@ export default function VideoCard({
   onAddToPlaylist,
   onAddToQueue,
   onShare,
+  onChannelClick,
 }) {
   const { t } = useI18n();
   const [previewSrc, setPreviewSrc] = useState(null);
@@ -156,7 +157,17 @@ export default function VideoCard({
       </div>
       <div className="video-card__info">
         <h3 className="video-card__title">{video.title}</h3>
-        <p className="video-card__channel">{video.channel}</p>
+        {onChannelClick ? (
+          <button
+            className="video-card__channel video-card__channel--link"
+            onClick={(e) => { e.stopPropagation(); onChannelClick(video.channel, video.channelId); }}
+            title={t('channel.viewChannel')}
+          >
+            {video.channel}
+          </button>
+        ) : (
+          <p className="video-card__channel">{video.channel}</p>
+        )}
       </div>
     </div>
   );

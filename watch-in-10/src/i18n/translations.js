@@ -188,6 +188,9 @@ export const translations = {
     'room.setupStep1': 'Create a Firebase project at firebase.google.com',
     'room.setupStep2': 'Enable Realtime Database in the Firebase console',
     'room.setupStep3': 'Add VITE_FIREBASE_DATABASE_URL to your .env file',
+    'channel.viewChannel': 'View channel videos',
+    'channel.back': 'Back',
+    'channel.noVideos': 'No videos found',
   },
   hi: {
     'header.title1': 'क्या देखें',
@@ -317,6 +320,9 @@ export const translations = {
     'room.setupStep1': 'firebase.google.com पर Firebase प्रोजेक्ट बनाएं',
     'room.setupStep2': 'Firebase कंसोल में Realtime Database चालू करें',
     'room.setupStep3': 'अपनी .env फ़ाइल में VITE_FIREBASE_DATABASE_URL जोड़ें',
+    'channel.viewChannel': 'चैनल के वीडियो देखें',
+    'channel.back': 'वापस',
+    'channel.noVideos': 'कोई वीडियो नहीं मिला',
   },
   es: {
     'header.title1': 'Qué debería ver',
@@ -426,6 +432,9 @@ export const translations = {
     'room.setupStep1': 'Crea un proyecto en firebase.google.com',
     'room.setupStep2': 'Activa Realtime Database en la consola de Firebase',
     'room.setupStep3': 'Agrega VITE_FIREBASE_DATABASE_URL a tu archivo .env',
+    'channel.viewChannel': 'Ver videos del canal',
+    'channel.back': 'Volver',
+    'channel.noVideos': 'No se encontraron videos',
   },
   fr: {
     'header.title1': 'Que regarder',
@@ -532,5 +541,8 @@ export const translations = {
     'room.setupStep1': 'Créez un projet sur firebase.google.com',
     'room.setupStep2': 'Activez Realtime Database dans la console Firebase',
     'room.setupStep3': 'Ajoutez VITE_FIREBASE_DATABASE_URL à votre fichier .env',
+    'channel.viewChannel': 'Voir les vidéos de la chaîne',
+    'channel.back': 'Retour',
+    'channel.noVideos': 'Aucune vidéo trouvée',
   },
 };

@@ -187,12 +187,34 @@
   margin: 4px 0 0;
 }
 
-/* Search panel */
-.watch-room__search-panel {
-  padding: 16px 20px;
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
-  flex-shrink: 0;
+.watch-room__channel-link {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.watch-room__channel-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+/* Search overlay (on top of video) */
+.watch-room__search-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .watch-room__search-form {
@@ -205,12 +227,16 @@
   padding: 10px 16px;
   font-size: 0.9rem;
   font-family: inherit;
-  color: var(--color-text);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius);
   outline: none;
   transition: border-color var(--transition);
+}
+
+.watch-room__search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .watch-room__search-input:focus {
@@ -234,13 +260,13 @@
 .watch-room__search-close {
   padding: 10px;
   font-size: 1rem;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   background: transparent;
   border-radius: var(--radius);
 }
 
 .watch-room__search-close:hover {
-  color: var(--color-text);
+  color: #fff;
 }
 
 .watch-room__search-results {
@@ -263,7 +289,7 @@
 }
 
 .watch-room__search-item:hover {
-  background: var(--color-accent-light);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .watch-room__search-thumb {
@@ -284,7 +310,7 @@
 .watch-room__search-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text);
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -292,7 +318,7 @@
 
 .watch-room__search-channel {
   font-size: 0.75rem;
-  color: var(--color-text-tertiary);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Sidebar */

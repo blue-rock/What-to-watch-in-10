@@ -1,0 +1,347 @@
+.channel-page {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: var(--color-bg);
+  overflow-y: auto;
+  animation: cp-slide-in 0.3s ease;
+}
+
+@keyframes cp-slide-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Banner */
+.channel-page__banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  background-size: cover;
+  background-position: center;
+}
+
+.channel-page__back {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.channel-page__back:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Channel info */
+.channel-page__info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 32px;
+  margin-top: -40px;
+  position: relative;
+  z-index: 1;
+}
+
+.channel-page__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--color-bg);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.channel-page__avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-accent);
+}
+
+.channel-page__meta {
+  padding-top: 44px;
+}
+
+.channel-page__name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.channel-page__details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.channel-page__handle {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.channel-page__subs {
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+}
+
+/* Content / Grid */
+.channel-page__content {
+  padding: 24px 32px 60px;
+}
+
+.channel-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.channel-page__video-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.channel-page__video-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.channel-page__thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.channel-page__thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.channel-page__duration {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+}
+
+.channel-page__video-info {
+  padding: 10px 12px 12px;
+}
+
+.channel-page__video-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.channel-page__video-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin: 4px 0 0;
+}
+
+/* Inline player */
+.channel-page__player-section {
+  padding: 20px 32px;
+  background: #000;
+}
+
+.channel-page__player-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.channel-page__player {
+  width: 100%;
+  height: 100%;
+}
+
+.channel-page__player iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.channel-page__player-info {
+  max-width: 900px;
+  margin: 12px auto 0;
+  color: #fff;
+}
+
+.channel-page__player-info h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.channel-page__player-info p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 4px 0 0;
+}
+
+.channel-page__close-player {
+  margin-top: 10px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.channel-page__close-player:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Now playing indicator */
+.channel-page__now-playing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.channel-page__video-card--active {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.channel-page__empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 60px 20px;
+  font-size: 1rem;
+}
+
+/* Skeleton loading */
+.channel-page__skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.channel-page__skeleton-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.channel-page__skeleton-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--color-border);
+  animation: cp-pulse 1.5s ease-in-out infinite;
+}
+
+.channel-page__skeleton-title {
+  height: 14px;
+  margin: 12px 12px 6px;
+  background: var(--color-border);
+  border-radius: 4px;
+  animation: cp-pulse 1.5s ease-in-out infinite;
+}
+
+.channel-page__skeleton-sub {
+  height: 10px;
+  width: 60%;
+  margin: 0 12px 12px;
+  background: var(--color-border);
+  border-radius: 4px;
+  animation: cp-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes cp-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .channel-page__banner {
+    height: 130px;
+  }
+
+  .channel-page__info {
+    padding: 0 16px;
+    gap: 14px;
+  }
+
+  .channel-page__avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .channel-page__meta {
+    padding-top: 34px;
+  }
+
+  .channel-page__name {
+    font-size: 1.2rem;
+  }
+
+  .channel-page__content {
+    padding: 16px 16px 40px;
+  }
+
+  .channel-page__grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .channel-page__player-section {
+    padding: 12px 16px;
+  }
+}

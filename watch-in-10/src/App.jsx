@@ -20,6 +20,7 @@ import OfflineBanner from './components/OfflineBanner';
 import StatsPage from './components/StatsPage';
 import WatchRoom from './components/WatchRoom';
 import WatchRoomLobby from './components/WatchRoomLobby';
+import ChannelPage from './components/ChannelPage';
 import { useYouTube } from './hooks/useYouTube';
 import { useTheme } from './hooks/useTheme';
 import { useFavorites } from './hooks/useFavorites';
@@ -81,6 +82,7 @@ export default function App() {
   const [shareMsg, setShareMsg] = useState('');
   const [filters, setFilters] = useState({ uploadDate: 'any', hd: false });
   const [dismissedIds, setDismissedIds] = useState(new Set());
+  const [channelView, setChannelView] = useState(null); // { channelId, channelName } or null
   const { videos, loading, error, usingFallback, search, searchQuery, reset } = useYouTube();
   const resultsRef = useRef(null);
   const searchBarRef = useRef(null);
@@ -211,6 +213,14 @@ export default function App() {
     searchQuery(query, DEFAULT_SEARCH_TIME);
     trackSearch(query);
   }, [searchQuery, trackSearch]);
+
+  const handleChannelClick = useCallback((channelName, channelId) => {
+    if (channelId) {
+      setChannelView({ channelId, channelName });
+    } else {
+      handleSearch(channelName);
+    }
+  }, [handleSearch]);
 
   const handlePlayVideo = useCallback((video) => {
     addToHistory(video);
@@ -394,6 +404,7 @@ export default function App() {
                     onPlay={handlePlayVideo}
                     onToggleFavorite={toggleFavorite}
                     isFavorite={isFavorite}
+                    onChannelClick={handleChannelClick}
                   />
                 )}
 
@@ -402,6 +413,7 @@ export default function App() {
                     onPlay={handlePlayVideo}
                     onToggleFavorite={toggleFavorite}
                     isFavorite={isFavorite}
+                    onChannelClick={handleChannelClick}
                   />
                 )}
 
@@ -446,6 +458,7 @@ export default function App() {
                       onAddToQueue={addToQueue}
                       onShare={handleShareVideo}
                       onDismiss={handleDismiss}
+                      onChannelClick={handleChannelClick}
                     />
 
                     <div className="app__actions">
@@ -469,6 +482,7 @@ export default function App() {
                 onPlay={handlePlayVideo}
                 onToggleFavorite={toggleFavorite}
                 isFavorite={isFavorite}
+                onChannelClick={handleChannelClick}
               />
             )}
 
@@ -482,6 +496,7 @@ export default function App() {
                     onPlay={handlePlayVideo}
                     onToggleFavorite={toggleFavorite}
                     isFavorite={isFavorite}
+                    onChannelClick={handleChannelClick}
                   />
                 )}
               </div>
@@ -522,6 +537,7 @@ export default function App() {
           onPlayRelated={handlePlayRelated}
           onVideoEnd={handleVideoEnd}
           onWatchTogether={handleWatchTogether}
+          onChannelClick={handleChannelClick}
         />
       )}
 
@@ -548,6 +564,7 @@ export default function App() {
           onDeletePlaylist={deletePlaylist}
           onRenamePlaylist={renamePlaylist}
           onRemoveFromPlaylist={removeFromPlaylist}
+          onChannelClick={handleChannelClick}
         />
       )}
 
@@ -584,6 +601,15 @@ export default function App() {
           onSendReaction={room.sendReaction}
           onSetVideo={room.setVideo}
           onLeave={handleLeaveRoom}
+        />
+      )}
+
+      {channelView && (
+        <ChannelPage
+          channelId={channelView.channelId}
+          channelName={channelView.channelName}
+          onClose={() => setChannelView(null)}
+          onPlay={(video) => { addToHistory(video); trackWatch(video, selectedMood?.id); }}
         />
       )}
     </div>

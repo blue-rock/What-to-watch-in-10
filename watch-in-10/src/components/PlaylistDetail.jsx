@@ -2,7 +2,7 @@ import VideoCard from './VideoCard';
 import { useI18n } from '../hooks/useI18n';
 import './PlaylistDetail.css';
 
-export default function PlaylistDetail({ playlist, onBack, onPlay, onToggleFavorite, isFavorite, onRemoveFromPlaylist }) {
+export default function PlaylistDetail({ playlist, onBack, onPlay, onToggleFavorite, isFavorite, onRemoveFromPlaylist, onChannelClick }) {
   const { t } = useI18n();
 
   return (
@@ -24,6 +24,7 @@ export default function PlaylistDetail({ playlist, onBack, onPlay, onToggleFavor
                 onPlay={onPlay}
                 onToggleFavorite={onToggleFavorite}
                 isFavorited={isFavorite?.(video.id)}
+                onChannelClick={onChannelClick}
               />
               <button
                 className="playlist-detail__remove"

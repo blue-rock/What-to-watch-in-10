@@ -129,6 +129,20 @@
   color: var(--color-text-secondary);
 }
 
+.video-modal__channel--link {
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  transition: color var(--transition);
+  display: block;
+}
+
+.video-modal__channel--link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
 .video-modal__related {
   border-top: 1px solid var(--color-border);
   padding: 12px 16px 16px;
