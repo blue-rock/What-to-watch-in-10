@@ -168,6 +168,242 @@
   background: var(--color-accent-hover);
 }
 
+/* Empty-state search (no video yet) */
+.watch-room__empty-search-form {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.watch-room__empty-search-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.watch-room__empty-search-input:focus {
+  border-color: var(--color-accent);
+}
+
+.watch-room__empty-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 350px;
+  overflow-y: auto;
+  margin-top: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+.watch-room__empty-search-results .watch-room__search-item {
+  border-radius: var(--radius-sm);
+}
+
+.watch-room__empty-search-results .watch-room__search-item:hover {
+  background: var(--color-accent-light);
+}
+
+.watch-room__empty-search-results .watch-room__search-title {
+  color: var(--color-text);
+}
+
+.watch-room__empty-search-results .watch-room__search-channel {
+  color: var(--color-text-secondary);
+}
+
+/* Loading sentinel for infinite scroll */
+.watch-room__load-sentinel {
+  padding: 12px;
+  text-align: center;
+}
+
+.watch-room__loading-dots {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+}
+
+/* In-room channel panel */
+.watch-room__channel-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.watch-room__channel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.watch-room__channel-back {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  border-radius: 100px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.watch-room__channel-back:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
+.watch-room__channel-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watch-room__channel-subs {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.watch-room__channel-loading {
+  padding: 20px;
+}
+
+.watch-room__channel-grid-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.watch-room__channel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.watch-room__channel-video {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  background: var(--color-surface);
+}
+
+.watch-room__channel-video:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.watch-room__channel-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  overflow: hidden;
+}
+
+.watch-room__channel-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.watch-room__channel-duration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+}
+
+.watch-room__channel-vid-info {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.watch-room__channel-vid-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.watch-room__channel-vid-meta {
+  font-size: 0.7rem;
+  color: var(--color-text-tertiary);
+}
+
+.watch-room__channel-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* Skeleton loading for channel */
+.watch-room__skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.watch-room__skeleton-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.watch-room__skeleton-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--color-border);
+  border-radius: var(--radius);
+  animation: wr-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.watch-room__skeleton-title {
+  height: 12px;
+  width: 80%;
+  margin-top: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  animation: wr-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes wr-skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
 /* Video info */
 .watch-room__video-info {
   padding: 12px 20px;
@@ -383,8 +619,8 @@
   text-transform: uppercase;
 }
 
-/* Video Chat */
-.watch-room__videochat-btn {
+/* Shared Control Toggle */
+.watch-room__shared-ctrl-btn {
   padding: 5px 14px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -395,40 +631,162 @@
   transition: all var(--transition);
 }
 
-.watch-room__videochat-btn:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+.watch-room__shared-ctrl-btn:hover {
+  border-color: #27ae60;
+  color: #27ae60;
 }
 
-.watch-room__videochat-btn--active {
+.watch-room__shared-ctrl-btn--active {
   color: white;
-  background: #e74c3c;
-  border-color: #e74c3c;
+  background: #27ae60;
+  border-color: #27ae60;
 }
 
-.watch-room__videochat-btn--active:hover {
-  background: #c0392b;
-  border-color: #c0392b;
+.watch-room__shared-ctrl-btn--active:hover {
+  background: #219a52;
+  border-color: #219a52;
   color: white;
 }
 
-.watch-room__video-preview {
-  margin-bottom: 12px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: #000;
+.watch-room__shared-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.12);
+  padding: 3px 10px;
+  border-radius: 100px;
 }
 
-.watch-room__local-video {
+[data-theme="dark"] .watch-room__shared-badge {
+  background: rgba(39, 174, 96, 0.2);
+}
+
+/* Google Meet */
+.watch-room__meet-title {
+  margin-top: 20px;
+}
+
+.watch-room__meet {
+  margin-bottom: 8px;
+}
+
+.watch-room__meet-active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.watch-room__meet-join-btn {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: #00897b;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
   width: 100%;
-  display: block;
-  border-radius: var(--radius);
-  transform: scaleX(-1);
+}
+
+.watch-room__meet-join-btn:hover {
+  background: #00695c;
+}
+
+.watch-room__meet-end-btn {
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #e74c3c;
+  background: transparent;
+  border: 1px solid #e74c3c;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  width: 100%;
+}
+
+.watch-room__meet-end-btn:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.watch-room__meet-start-btn {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  background: #00897b;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  width: 100%;
+}
+
+.watch-room__meet-start-btn:hover {
+  background: #00695c;
+}
+
+.watch-room__meet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.watch-room__meet-input {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.watch-room__meet-input:focus {
+  border-color: #00897b;
+}
+
+.watch-room__meet-submit {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  background: #00897b;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+
+.watch-room__meet-submit:hover:not(:disabled) {
+  background: #00695c;
+}
+
+.watch-room__meet-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.watch-room__meet-cancel {
+  padding: 4px;
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  background: transparent;
+  align-self: center;
+}
+
+.watch-room__meet-cancel:hover {
+  color: var(--color-text);
+}
+
+.watch-room__meet-empty {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin: 0;
 }
 
 /* Chat */
 .watch-room__chat-title {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .watch-room__chat {

@@ -24,7 +24,9 @@ function renderWatchRoom(props = {}) {
     onSendMessage: vi.fn(),
     onSetVideo: vi.fn(),
     onLeave: vi.fn(),
-    onChannelClick: vi.fn(),
+    onToggleSharedControl: vi.fn(),
+    onSetMeetLink: vi.fn(),
+    onClearMeetLink: vi.fn(),
   };
   return render(
     <I18nProvider>
@@ -51,12 +53,12 @@ describe('WatchRoom', () => {
   });
 
   it('renders channel name as clickable link', () => {
-    const onChannelClick = vi.fn();
-    renderWatchRoom({ onChannelClick });
+    renderWatchRoom();
     const channelBtn = screen.getByText('Test Channel');
     expect(channelBtn.tagName).toBe('BUTTON');
+    // Channel clicks are now handled internally (open channel panel)
     fireEvent.click(channelBtn);
-    expect(onChannelClick).toHaveBeenCalled();
+    expect(channelBtn).toBeInTheDocument();
   });
 
   it('renders Leave Room button and calls handler', () => {
@@ -102,9 +104,9 @@ describe('WatchRoom', () => {
     expect(screen.getByText('Hey!')).toBeInTheDocument();
   });
 
-  it('renders video chat toggle button', () => {
-    renderWatchRoom();
-    expect(screen.getByText('Start Video')).toBeInTheDocument();
+  it('renders shared control button for host', () => {
+    renderWatchRoom({ isHost: true });
+    expect(screen.getByText('Enable Shared Control')).toBeInTheDocument();
   });
 
   it('renders Change Video button for host', () => {
@@ -125,5 +127,27 @@ describe('WatchRoom', () => {
   it('shows participant count', () => {
     renderWatchRoom();
     expect(screen.getByText(/2 watching/)).toBeInTheDocument();
+  });
+
+  it('renders Start Video Call button for host', () => {
+    renderWatchRoom({ isHost: true });
+    expect(screen.getByText('Start Video Call')).toBeInTheDocument();
+  });
+
+  it('shows Join Video Call when meet link is active', () => {
+    renderWatchRoom({
+      roomData: {
+        host: 'user1',
+        video: { id: 'vid1', title: 'Test Video', channel: 'Test Channel', thumbnail: '', url: '' },
+        state: { playing: false, currentTime: 0, updatedAt: Date.now(), updatedBy: 'user1' },
+        meetLink: 'https://meet.google.com/abc-defg-hij',
+      },
+    });
+    expect(screen.getByText('Join Video Call')).toBeInTheDocument();
+  });
+
+  it('shows no active call message for non-host without meet link', () => {
+    renderWatchRoom({ isHost: false });
+    expect(screen.getByText('No active video call')).toBeInTheDocument();
   });
 });

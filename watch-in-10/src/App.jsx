@@ -630,7 +630,9 @@ export default function App() {
           onSendMessage={room.sendMessage}
           onSetVideo={room.setVideo}
           onLeave={handleLeaveRoom}
-          onChannelClick={handleChannelClick}
+          onToggleSharedControl={room.toggleSharedControl}
+          onSetMeetLink={room.setMeetLink}
+          onClearMeetLink={room.clearMeetLink}
         />
       )}
 

@@ -20,9 +20,10 @@ function parseDurationText(text) {
   return 0;
 }
 
-/** Extract videos from YouTube's internal search response. */
+/** Extract videos + continuation token from YouTube's internal search response. */
 function extractVideos(data) {
   const videos = [];
+  let continuation = null;
   try {
     const contents =
       data?.contents?.twoColumnSearchResultsRenderer?.primaryContents
@@ -54,11 +55,78 @@ function extractVideos(data) {
           url: `https://www.youtube.com/watch?v=${vr.videoId}`,
         });
       }
+      // Continuation token from section list
+      const cont = section?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+      if (cont) continuation = cont;
     }
   } catch (e) {
     console.error('Error parsing YouTube response:', e);
   }
-  return videos;
+  return { videos, continuation };
+}
+
+/** Extract videos + continuation from a search continuation response. */
+function extractSearchContinuation(data) {
+  const videos = [];
+  let continuation = null;
+  try {
+    const actions = data?.onResponseReceivedCommands || [];
+    for (const action of actions) {
+      const items = action?.appendContinuationItemsAction?.continuationItems || [];
+      for (const item of items) {
+        const vr = item?.itemSectionRenderer?.contents?.[0]?.videoRenderer
+          || item?.videoRenderer;
+        if (vr) {
+          const durationText = vr.lengthText?.simpleText || '';
+          const durationSeconds = parseDurationText(durationText);
+          if (durationSeconds <= 0) continue;
+          const viewText = vr.viewCountText?.simpleText || '';
+          const viewCount = parseInt(viewText.replace(/[^0-9]/g, ''), 10) || 0;
+          videos.push({
+            id: vr.videoId,
+            title: vr.title?.runs?.[0]?.text || '',
+            channel: vr.ownerText?.runs?.[0]?.text || '',
+            channelId: vr.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '',
+            channelAvatar: vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '',
+            thumbnail: vr.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || `https://i.ytimg.com/vi/${vr.videoId}/hqdefault.jpg`,
+            durationSeconds,
+            viewCount,
+            publishedAt: vr.publishedTimeText?.simpleText || '',
+            url: `https://www.youtube.com/watch?v=${vr.videoId}`,
+          });
+          continue;
+        }
+        // Check for nested itemSectionRenderer with multiple videos
+        const sectionItems = item?.itemSectionRenderer?.contents || [];
+        for (const si of sectionItems) {
+          const svr = si?.videoRenderer;
+          if (!svr) continue;
+          const durationText = svr.lengthText?.simpleText || '';
+          const durationSeconds = parseDurationText(durationText);
+          if (durationSeconds <= 0) continue;
+          const viewText = svr.viewCountText?.simpleText || '';
+          const viewCount = parseInt(viewText.replace(/[^0-9]/g, ''), 10) || 0;
+          videos.push({
+            id: svr.videoId,
+            title: svr.title?.runs?.[0]?.text || '',
+            channel: svr.ownerText?.runs?.[0]?.text || '',
+            channelId: svr.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '',
+            channelAvatar: svr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '',
+            thumbnail: svr.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || `https://i.ytimg.com/vi/${svr.videoId}/hqdefault.jpg`,
+            durationSeconds,
+            viewCount,
+            publishedAt: svr.publishedTimeText?.simpleText || '',
+            url: `https://www.youtube.com/watch?v=${svr.videoId}`,
+          });
+        }
+        const cont = item?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token;
+        if (cont) continuation = cont;
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing search continuation:', e);
+  }
+  return { videos, continuation };
 }
 
 /** Extract videos + continuation token from a continuation response. */
@@ -319,36 +387,56 @@ function youtubeSearchPlugin() {
         }
       });
 
-      // Search endpoint
+      // Search endpoint (supports initial query and continuation)
       server.middlewares.use('/api/search', async (req, res) => {
         const url = new URL(req.url, 'http://localhost');
         const q = url.searchParams.get('q');
         const duration = url.searchParams.get('duration');
         const hl = url.searchParams.get('hl') || 'en';
+        const continuation = url.searchParams.get('continuation');
 
-        if (!q) {
-          res.statusCode = 400;
-          res.end(JSON.stringify({ error: 'Missing "q" query parameter' }));
-          return;
-        }
-
-        const body = {
-          context: {
-            client: {
-              clientName: 'WEB',
-              clientVersion: '2.20250227.00.00',
-              hl,
-              gl: 'US',
-            },
-          },
-          query: q,
+        const clientContext = {
+          clientName: 'WEB',
+          clientVersion: '2.20250227.00.00',
+          hl,
+          gl: 'US',
         };
 
-        if (duration && SP_FILTERS[duration]) {
-          body.params = SP_FILTERS[duration];
-        }
-
         try {
+          // Continuation request — load next page of search results
+          if (continuation) {
+            const contRes = await fetch(YOUTUBE_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ context: { client: clientContext }, continuation }),
+            });
+            if (!contRes.ok) {
+              res.statusCode = contRes.status;
+              res.end(JSON.stringify({ error: `YouTube returned ${contRes.status}` }));
+              return;
+            }
+            const contData = await contRes.json();
+            const page = extractSearchContinuation(contData);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ items: page.videos, continuation: page.continuation }));
+            return;
+          }
+
+          if (!q) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Missing "q" query parameter' }));
+            return;
+          }
+
+          const body = {
+            context: { client: clientContext },
+            query: q,
+          };
+
+          if (duration && SP_FILTERS[duration]) {
+            body.params = SP_FILTERS[duration];
+          }
+
           const ytRes = await fetch(YOUTUBE_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -362,10 +450,10 @@ function youtubeSearchPlugin() {
           }
 
           const data = await ytRes.json();
-          const videos = extractVideos(data);
+          const { videos, continuation: nextToken } = extractVideos(data);
 
           res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ items: videos }));
+          res.end(JSON.stringify({ items: videos, continuation: nextToken }));
         } catch (err) {
           console.error('YouTube search proxy error:', err);
           res.statusCode = 500;

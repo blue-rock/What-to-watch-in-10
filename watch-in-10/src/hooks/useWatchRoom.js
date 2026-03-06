@@ -116,21 +116,41 @@ export function useWatchRoom() {
   }, [configured, roomId, isHost]);
 
   const setVideo = useCallback(async (video) => {
-    if (!configured || !roomId || !isHost) return;
+    if (!configured || !roomId) return;
+    if (!isHost && !roomData?.sharedControl) return;
     const db = getFirebaseDB();
     const id = uid.current;
     await set(ref(db, `rooms/${roomId}/video`), pickVideo(video));
     await set(ref(db, `rooms/${roomId}/state`), {
       playing: false, currentTime: 0, updatedAt: Date.now(), updatedBy: id,
     });
-  }, [configured, roomId, isHost]);
+  }, [configured, roomId, isHost, roomData?.sharedControl]);
 
   const syncPlayback = useCallback(async (playing, currentTime) => {
-    if (!configured || !roomId || !isHost) return;
+    if (!configured || !roomId) return;
     const db = getFirebaseDB();
     await set(ref(db, `rooms/${roomId}/state`), {
       playing, currentTime, updatedAt: Date.now(), updatedBy: uid.current,
     });
+  }, [configured, roomId]);
+
+  const toggleSharedControl = useCallback(async () => {
+    if (!configured || !roomId || !isHost) return;
+    const db = getFirebaseDB();
+    const current = roomData?.sharedControl || false;
+    await set(ref(db, `rooms/${roomId}/sharedControl`), !current);
+  }, [configured, roomId, isHost, roomData?.sharedControl]);
+
+  const setMeetLink = useCallback(async (link) => {
+    if (!configured || !roomId || !isHost) return;
+    const db = getFirebaseDB();
+    await set(ref(db, `rooms/${roomId}/meetLink`), link || null);
+  }, [configured, roomId, isHost]);
+
+  const clearMeetLink = useCallback(async () => {
+    if (!configured || !roomId || !isHost) return;
+    const db = getFirebaseDB();
+    await remove(ref(db, `rooms/${roomId}/meetLink`));
   }, [configured, roomId, isHost]);
 
   const sendReaction = useCallback(async (emoji) => {
@@ -218,6 +238,6 @@ export function useWatchRoom() {
   return {
     roomId, roomData, isHost, participants, reactions, messages, error,
     userId: uid.current, configured,
-    createRoom, joinRoom, rejoinRoom, leaveRoom, setVideo, syncPlayback, sendReaction, sendMessage,
+    createRoom, joinRoom, rejoinRoom, leaveRoom, setVideo, syncPlayback, toggleSharedControl, sendReaction, sendMessage, setMeetLink, clearMeetLink,
   };
 }

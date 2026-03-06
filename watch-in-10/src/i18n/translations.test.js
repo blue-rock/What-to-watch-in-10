@@ -17,7 +17,6 @@ describe('translations', () => {
       'header.title1', 'header.title2', 'header.subtitle',
       'search.placeholder', 'search.button',
       'room.watchRoom', 'room.chat', 'room.chatSend',
-      'room.videoChatOn', 'room.videoChatOff',
       'results.share', 'results.refresh',
       'channel.viewChannel',
     ];
@@ -35,8 +34,17 @@ describe('translations', () => {
     }
   });
 
-  it('all locales have video chat translation keys', () => {
-    const keys = ['room.videoChatOn', 'room.videoChatOff'];
+  it('all locales have shared control translation keys', () => {
+    const keys = ['room.sharedControlOn', 'room.sharedControlOff', 'room.sharedControlActive'];
+    for (const locale of locales) {
+      for (const key of keys) {
+        expect(translations[locale][key], `${locale} missing ${key}`).toBeDefined();
+      }
+    }
+  });
+
+  it('all locales have video call (Meet) translation keys', () => {
+    const keys = ['room.videoCall', 'room.startMeet', 'room.joinMeet', 'room.endMeet', 'room.meetPlaceholder', 'room.meetShare', 'room.noMeet'];
     for (const locale of locales) {
       for (const key of keys) {
         expect(translations[locale][key], `${locale} missing ${key}`).toBeDefined();
