@@ -592,9 +592,6 @@ export default function WatchRoom({
                 placeholder={t('room.chatPlaceholder')}
                 maxLength={200}
               />
-              <button type="submit" className="watch-room__chat-send" disabled={!chatMsg.trim()}>
-                {t('room.chatSend')}
-              </button>
             </form>
           </div>
         </div>

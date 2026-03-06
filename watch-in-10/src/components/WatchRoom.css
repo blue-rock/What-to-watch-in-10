@@ -564,7 +564,10 @@
   padding: 16px;
   border-left: 1px solid var(--color-border);
   background: var(--color-surface);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .watch-room__sidebar-title {
@@ -580,6 +583,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 8px;
 }
 
 .watch-room__participant {
@@ -668,6 +673,7 @@
 
 .watch-room__meet {
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .watch-room__meet-active {
@@ -803,7 +809,7 @@
   flex-direction: column;
   gap: 6px;
   margin-bottom: 8px;
-  max-height: 300px;
+  min-height: 0;
 }
 
 .watch-room__chat-empty {
@@ -833,6 +839,8 @@
 .watch-room__chat-form {
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .watch-room__chat-input {
