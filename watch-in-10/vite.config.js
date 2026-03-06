@@ -281,6 +281,44 @@ function youtubeSearchPlugin() {
         }
       });
 
+      // Autocomplete suggest endpoint
+      server.middlewares.use('/api/suggest', async (req, res) => {
+        const url = new URL(req.url, 'http://localhost');
+        const q = url.searchParams.get('q');
+        const hl = url.searchParams.get('hl') || 'en';
+
+        if (!q) {
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify([]));
+          return;
+        }
+
+        try {
+          const suggestUrl = `https://suggestqueries-clients6.youtube.com/complete/search?client=youtube&ds=yt&q=${encodeURIComponent(q)}&hl=${hl}`;
+          const ytRes = await fetch(suggestUrl);
+          if (!ytRes.ok) {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify([]));
+            return;
+          }
+          const text = await ytRes.text();
+          // Response is JSONP: window.google.ac.h([...])
+          const match = text.match(/\[.+\]/s);
+          if (!match) {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify([]));
+            return;
+          }
+          const parsed = JSON.parse(match[0]);
+          const suggestions = (parsed[1] || []).map((s) => s[0]).filter(Boolean);
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(suggestions));
+        } catch {
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify([]));
+        }
+      });
+
       // Search endpoint
       server.middlewares.use('/api/search', async (req, res) => {
         const url = new URL(req.url, 'http://localhost');
@@ -340,6 +378,16 @@ function youtubeSearchPlugin() {
 
 export default defineConfig({
   plugins: [react(), youtubeSearchPlugin()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          firebase: ['firebase/app', 'firebase/database', 'firebase/auth'],
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.js'],

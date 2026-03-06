@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { formatDuration } from '../utils/duration';
 import { shareToWhatsApp, shareToTwitter, copyVideoLink, shareNative } from '../utils/share';
+import { getThumbnailSrcSet } from '../utils/thumbnail';
 import { useI18n } from '../hooks/useI18n';
 import './VideoCard.css';
 
@@ -65,8 +66,11 @@ export default function VideoCard({
         <img
           className="video-card__thumb"
           src={previewSrc || video.thumbnail}
+          srcSet={previewSrc ? undefined : getThumbnailSrcSet(video.thumbnail, video.id)}
+          sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
           alt={video.title}
           loading="lazy"
+          decoding="async"
           onError={() => setPreviewSrc(null)}
         />
         <span className="video-card__duration">

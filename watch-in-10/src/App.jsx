@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import MoodSelector from './components/MoodSelector';
@@ -6,21 +6,23 @@ import TimePicker from './components/TimePicker';
 import VideoGrid from './components/VideoGrid';
 import SkeletonGrid from './components/SkeletonGrid';
 import Footer from './components/Footer';
-import VideoPlayerModal from './components/VideoPlayerModal';
-import FavoritesPanel from './components/FavoritesPanel';
 import Onboarding from './components/Onboarding';
-import DailyPicks from './components/DailyPicks';
 import SortFilter from './components/SortFilter';
-import TrendingSection from './components/TrendingSection';
 import CategoryTabs from './components/CategoryTabs';
 import AdvancedFilters from './components/AdvancedFilters';
-import WatchQueue from './components/WatchQueue';
 import MiniPlayer from './components/MiniPlayer';
 import OfflineBanner from './components/OfflineBanner';
-import StatsPage from './components/StatsPage';
-import WatchRoom from './components/WatchRoom';
-import WatchRoomLobby from './components/WatchRoomLobby';
-import ChannelPage from './components/ChannelPage';
+
+// Lazy-loaded components (conditionally rendered modals / full-screen views)
+const VideoPlayerModal = lazy(() => import('./components/VideoPlayerModal'));
+const FavoritesPanel = lazy(() => import('./components/FavoritesPanel'));
+const DailyPicks = lazy(() => import('./components/DailyPicks'));
+const TrendingSection = lazy(() => import('./components/TrendingSection'));
+const WatchQueue = lazy(() => import('./components/WatchQueue'));
+const StatsPage = lazy(() => import('./components/StatsPage'));
+const WatchRoom = lazy(() => import('./components/WatchRoom'));
+const WatchRoomLobby = lazy(() => import('./components/WatchRoomLobby'));
+const ChannelPage = lazy(() => import('./components/ChannelPage'));
 import { useYouTube } from './hooks/useYouTube';
 import { useTheme } from './hooks/useTheme';
 import { useFavorites } from './hooks/useFavorites';
@@ -31,6 +33,7 @@ import { useShareList } from './hooks/useShareList';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useWatchRoom } from './hooks/useWatchRoom';
 import { useI18n } from './hooks/useI18n';
+import { useCloudSync } from './hooks/useCloudSync';
 import { copyVideoLink, shareNative } from './utils/share';
 import { getTopMoods, getSuggestedQueries } from './services/recommendations';
 import { moods, durations } from './data/moods';
@@ -66,6 +69,7 @@ export default function App() {
   const { usage, trackMood, trackSearch, trackWatch } = useUsageTracker();
   const { share } = useShareList();
   const room = useWatchRoom();
+  useCloudSync();
   const [roomMode, setRoomMode] = useState(null); // null | 'lobby' | 'room'
   const [initialRoomCode, setInitialRoomCode] = useState('');
   const [selectedMood, setSelectedMood] = useState(null);
@@ -284,13 +288,35 @@ export default function App() {
     setDismissedIds((prev) => new Set(prev).add(videoId));
   }, []);
 
-  // Watch Room: check URL hash for room code on mount
+  // Watch Room: check URL hash or stored session for auto-rejoin on mount
   useEffect(() => {
     const hash = window.location.hash;
     const match = hash.match(/#room=([A-Z0-9]+)/i);
+    const storedCode = localStorage.getItem('watch10-room-code');
+
     if (match) {
-      setInitialRoomCode(match[1].toUpperCase());
-      setRoomMode('lobby');
+      const code = match[1].toUpperCase();
+      // If we have stored credentials for this room, auto-rejoin directly
+      if (storedCode === code) {
+        room.rejoinRoom(code).then((ok) => {
+          if (!ok) {
+            // Room no longer exists, show lobby
+            setInitialRoomCode(code);
+            setRoomMode('lobby');
+          }
+        });
+      } else {
+        setInitialRoomCode(code);
+        setRoomMode('lobby');
+      }
+    } else if (storedCode) {
+      // No hash but we have a stored room — try to rejoin
+      room.rejoinRoom(storedCode).then((ok) => {
+        if (!ok) {
+          localStorage.removeItem('watch10-room-code');
+          localStorage.removeItem('watch10-room-host');
+        }
+      });
     }
   }, []);
 
@@ -353,6 +379,7 @@ export default function App() {
         queueCount={queue.length}
       />
 
+      <Suspense fallback={null}>
       <main className="app__main" id="main-content">
         {showStats ? (
           <StatsPage usage={usage} onClose={() => setShowStats(false)} />
@@ -615,6 +642,7 @@ export default function App() {
           onPlay={(video) => { addToHistory(video); trackWatch(video, selectedMood?.id); }}
         />
       )}
+      </Suspense>
     </div>
   );
 }

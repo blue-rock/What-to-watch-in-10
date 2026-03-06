@@ -87,7 +87,56 @@ export default function VideoPlayerModal({ video, onClose, onMinimize, relatedVi
 
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      const player = playerRef.current;
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case ' ':
+          e.preventDefault();
+          if (player?.getPlayerState) {
+            const state = player.getPlayerState();
+            if (state === window.YT.PlayerState.PLAYING) player.pauseVideo();
+            else player.playVideo();
+          }
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (player?.getCurrentTime) player.seekTo(Math.max(0, player.getCurrentTime() - 5), true);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (player?.getCurrentTime) player.seekTo(player.getCurrentTime() + 5, true);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          if (player?.getVolume) player.setVolume(Math.min(100, player.getVolume() + 10));
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          if (player?.getVolume) player.setVolume(Math.max(0, player.getVolume() - 10));
+          break;
+        case 'f':
+        case 'F':
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            const iframe = containerRef.current?.querySelector('iframe');
+            if (iframe) {
+              if (document.fullscreenElement) document.exitFullscreen();
+              else iframe.requestFullscreen?.();
+            }
+          }
+          break;
+        case 'm':
+        case 'M':
+          if (!e.ctrlKey && !e.metaKey && player?.isMuted) {
+            e.preventDefault();
+            if (player.isMuted()) player.unMute(); else player.mute();
+          }
+          break;
+      }
     };
     document.addEventListener('keydown', handleKey);
     document.body.style.overflow = 'hidden';

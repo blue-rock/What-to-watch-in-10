@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchChannel, fetchChannelMore } from '../services/youtube';
 import { formatDuration } from '../utils/duration';
+import { getThumbnailSrcSet } from '../utils/thumbnail';
 import { useI18n } from '../hooks/useI18n';
 import './ChannelPage.css';
 
@@ -188,9 +189,12 @@ export default function ChannelPage({ channelId, channelName, onClose, onPlay })
                   <div className="channel-page__thumb-wrap">
                     <img
                       src={video.thumbnail}
+                      srcSet={getThumbnailSrcSet(video.thumbnail, video.id)}
+                      sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
                       alt={video.title}
                       className="channel-page__thumb"
                       loading="lazy"
+                      decoding="async"
                     />
                     {video.durationSeconds > 0 && (
                       <span className="channel-page__duration">

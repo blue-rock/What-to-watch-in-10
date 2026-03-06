@@ -15,10 +15,18 @@ export function isFirebaseConfigured() {
   return !!firebaseConfig.databaseURL;
 }
 
+export function getFirebaseApp() {
+  if (!isFirebaseConfigured()) return null;
+  if (!app) {
+    app = initializeApp(firebaseConfig);
+  }
+  return app;
+}
+
 export function getFirebaseDB() {
   if (!isFirebaseConfigured()) return null;
   if (!db) {
-    app = initializeApp(firebaseConfig);
+    getFirebaseApp();
     db = getDatabase(app);
   }
   return db;

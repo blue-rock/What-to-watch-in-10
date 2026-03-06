@@ -61,6 +61,8 @@ export function useWatchRoom() {
     await set(pRef, { name: userName, color, joinedAt: Date.now() });
     onDisconnect(pRef).remove();
 
+    localStorage.setItem('watch10-room-code', code);
+    localStorage.setItem('watch10-room-host', '1');
     setRoomId(code);
     setIsHost(true);
     setError(null);
@@ -82,6 +84,8 @@ export function useWatchRoom() {
     await set(pRef, { name: userName, color, joinedAt: Date.now() });
     onDisconnect(pRef).remove();
 
+    localStorage.setItem('watch10-room-code', code);
+    localStorage.setItem('watch10-room-host', data.host === id ? '1' : '0');
     setRoomId(code);
     setIsHost(data.host === id);
     setError(null);
@@ -100,6 +104,8 @@ export function useWatchRoom() {
       }
     } catch (e) { /* ignore cleanup errors */ }
 
+    localStorage.removeItem('watch10-room-code');
+    localStorage.removeItem('watch10-room-host');
     setRoomId(null);
     setRoomData(null);
     setIsHost(false);
@@ -145,6 +151,13 @@ export function useWatchRoom() {
     });
   }, [configured, roomId]);
 
+  // Auto-rejoin room on mount if stored session exists
+  const rejoinRoom = useCallback(async (code) => {
+    if (!configured) return false;
+    const userName = localStorage.getItem('watch10-user-name') || 'Guest';
+    return joinRoom(code, userName);
+  }, [configured, joinRoom]);
+
   // Listen to room data
   useEffect(() => {
     if (!configured || !roomId) return;
@@ -153,6 +166,8 @@ export function useWatchRoom() {
 
     const handler = onValue(roomRef, (snapshot) => {
       if (!snapshot.exists()) {
+        localStorage.removeItem('watch10-room-code');
+        localStorage.removeItem('watch10-room-host');
         setRoomId(null);
         setRoomData(null);
         setIsHost(false);
@@ -203,6 +218,6 @@ export function useWatchRoom() {
   return {
     roomId, roomData, isHost, participants, reactions, messages, error,
     userId: uid.current, configured,
-    createRoom, joinRoom, leaveRoom, setVideo, syncPlayback, sendReaction, sendMessage,
+    createRoom, joinRoom, rejoinRoom, leaveRoom, setVideo, syncPlayback, sendReaction, sendMessage,
   };
 }
